@@ -17,7 +17,7 @@ AdoptMe is an Android app that allows users to find pets for adoption.
 - **Story:** Allow users to see pets for adoption and get the contact information of their owners.
 - **Market:** Anyone who wants to adopt a pet or post one for adoption.
 - **Habit:** Users can look at pets at any time of the day. They can keep scrolling until they find one they like or check regularly at different times to wait for new pets to be posted.
-- **Scope:** The first version aims to be a MVP and be fully functional for users. Second version aims to have optional stories that improve user experience and add some convenient features.
+- **Scope:** The first version aims to be a MVP and be fully functional for users. The second version aims to have optional stories that improve user experience and add some convenient features.
 
 ## Product Spec
 
