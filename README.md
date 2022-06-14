@@ -28,8 +28,12 @@ AdoptMe is an Android app that allows users to find pets for adoption.
 * Users must be able to sign up and create a new profile.
 * Users must be able to log in and log out.
 * Once users are logged in, they can see the most recent pets posted for adoption.
-    * Users can scroll and view all Pets posted for adoption indefinitely.
+* Users can scroll and view all Pets posted for adoption indefinitely.
+    * Users can choose the source of the queried pets: mixed, from the Parse API, or from PetFinder exclusively.
     * Users can pull down to refresh the most recent pets for adoption.
+    * Users can filter pets.
+       * By type of animal.
+       * By location
 * Users can click on a Pet item and see a more detailed view of it.
     * In the detailed Pet view, users can see the owner's contact information, including an approximate location through an embedded map (using Google maps).
     * The app uses an animation to display the detailed view of a Pet.
@@ -43,17 +47,14 @@ AdoptMe is an Android app that allows users to find pets for adoption.
 **Optional Nice-to-have Stories**
 * Users can see their own profile information.
 * Users can edit their profile and add a photo.
-* Users can see other people's profiles.
 * Users can bookmark pet posts.
 * Users can see bookmarked pets.
-* Post pet functionality is built using modal overlay.
+* Users can see Pets near them in Map View and can click on the Pet page to go to their PetDetails page.
 * Users can share a pet's information.
 * Users can comment a Pet post.
-* Users can sign up and login using Facebook.
+* Users can see other people's profiles.
+* Users can sign up and login using Facebook or other external provider.
 * Show an indeterminate progress bar while a network request is being performed.
-* Users can filter pets.
-    * By type of animal.
-    * By location
 * Improve the app design.
 
 
