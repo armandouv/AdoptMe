@@ -139,9 +139,9 @@ AdoptMe is an Android app that allows users to find pets for adoption.
     * => Bookmarked Pets (optional)
 
 ## Wireframes
-<img src="https://github.com/armandouv/AdoptMe/blob/main/w1" width=600>
-<img src="https://github.com/armandouv/AdoptMe/blob/main/w2" width=600>
-<img src="https://github.com/armandouv/AdoptMe/blob/main/w3" width=600>
+<img src="https://github.com/armandouv/AdoptMe/blob/main/w1.jpg" width=600>
+<img src="https://github.com/armandouv/AdoptMe/blob/main/w2.jpg" width=600>
+<img src="https://github.com/armandouv/AdoptMe/blob/main/w3.jpg" width=600>
 
 ## Schema
 [This section will be completed in Unit 9]
