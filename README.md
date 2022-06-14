@@ -83,7 +83,7 @@ AdoptMe is an Android app that allows users to find pets for adoption.
         * Users can like or unlike a Pet by double-tapping their detailed view.
     * Users can click on a Pet item and see a more detailed view of it.
         * In the detailed Pet view, users can see the owner's contact information, including an approximate location through an embedded map (using Google maps).
-        * The app uses an animation to display the detailed view of a Pet. 
+        * The app uses an animation to display the detailed view of a Pet.
 * Creation
     * Users can comment a Pet post. (optional)
     * Post pet functionality is built using modal overlay. (optional)
@@ -139,14 +139,11 @@ AdoptMe is an Android app that allows users to find pets for adoption.
     * => Bookmarked Pets (optional)
 
 ## Wireframes
-[Add picture of your hand sketched wireframes in this section]
-<img src="YOUR_WIREFRAME_IMAGE_URL" width=600>
+<img src="https://github.com/armandouv/AdoptMe/blob/main/w1" width=600>
+<img src="https://github.com/armandouv/AdoptMe/blob/main/w2" width=600>
+<img src="https://github.com/armandouv/AdoptMe/blob/main/w3" width=600>
 
-### [BONUS] Digital Wireframes & Mockups
-
-### [BONUS] Interactive Prototype
-
-## Schema 
+## Schema
 [This section will be completed in Unit 9]
 ### Models
 [Add table of models]
