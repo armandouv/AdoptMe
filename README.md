@@ -39,6 +39,8 @@ AdoptMe is an Android app that allows users to find pets for adoption.
     * The app uses an animation to display the detailed view of a Pet.
 * Users can post a Pet for adoption.
     * When a Pet is posted, it should be visible in the most recent pets for adoption.
+    * Users can edit or delete their posted Pets.
+    * Users can see their posted Pets.
 * Users can like or unlike a Pet.
     * Users can like or unlike a Pet by double-tapping their detailed view.
 * Make sure the app uses a library to add visual polish.
