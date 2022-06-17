@@ -28,22 +28,18 @@ AdoptMe is an Android app that allows users to find pets for adoption.
 * Users must be able to sign up and create a new profile.
 * Users must be able to log in and log out.
 * Once users are logged in, they can see the most recent pets posted for adoption.
-* Users can scroll and view all Pets posted for adoption indefinitely.
-    * Users can choose the source of the queried pets: mixed, from the Parse API, or from PetFinder exclusively.
     * Users can pull down to refresh the most recent pets for adoption.
-    * Users can filter pets.
-       * By type of animal.
-       * By location
+    * Users can specify the priority of their desired attributes and their values, and get displayed all available pets ordered from the best to the worst match. (Complex feature)
+* Users can see nearby pets in a map view, up to a certain radius specified by them. (Complex feature)
+  * Users can click on Pet markers and be displayed a detailed view of the Pet.
 * Users can click on a Pet item and see a more detailed view of it.
     * In the detailed Pet view, users can see the owner's contact information, including an approximate location through an embedded map (using Google maps).
     * The app uses an animation to display the detailed view of a Pet.
 * Users can post a Pet for adoption.
     * When a Pet is posted, it should be visible in the most recent pets for adoption.
-    * Users can edit or delete their posted Pets.
-    * Users can see their posted Pets.
 * Users can like or unlike a Pet.
     * Users can like or unlike a Pet by double-tapping their detailed view.
-* Make sure the app uses a library to add visual polish.
+* Make sure the app uses a library to add visual polish. (Material Design)
 
 
 **Optional Nice-to-have Stories**
@@ -51,13 +47,19 @@ AdoptMe is an Android app that allows users to find pets for adoption.
 * Users can edit their profile and add a photo.
 * Users can bookmark pet posts.
 * Users can see bookmarked pets.
-* Users can see Pets near them in Map View and can click on the Pet page to go to their PetDetails page.
+* Users can choose the source of the queried pets: mixed, from the Parse API, or from PetFinder exclusively.
+* Users can filter pets.
+  * By type of animal.
+  * By location
+* Users can edit or delete their posted Pets.
+* Users can see their posted Pets.
 * Users can share a pet's information.
 * Users can comment a Pet post.
 * Users can see other people's profiles.
 * Users can sign up and login using Facebook or other external provider.
 * Show an indeterminate progress bar while a network request is being performed.
-* Improve the app design.
+* Make the radius filtering algorithm more efficient. (Complex feature)
+* Add some sort of caching to the general filtering algorithm. (Complex feature)
 
 
 ### 2. Screen Archetypes
