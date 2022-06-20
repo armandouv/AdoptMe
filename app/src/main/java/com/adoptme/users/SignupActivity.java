@@ -29,6 +29,17 @@ public class SignupActivity extends AppCompatActivity {
         mBinding.signupButton.setOnClickListener((view) -> {
             Editable username = mBinding.usernameSignup.getText();
             Editable password = mBinding.passwordSignup.getText();
+
+            if (username.toString().isEmpty()) {
+                Toast.makeText(this, "Username must not be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (password.toString().isEmpty()) {
+                Toast.makeText(this, "Password must not be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             signupUser(username.toString(), password.toString());
 
             username.clear();

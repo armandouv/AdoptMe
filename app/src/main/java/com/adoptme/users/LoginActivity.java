@@ -31,7 +31,16 @@ public class LoginActivity extends AppCompatActivity {
         mBinding.loginButton.setOnClickListener((view) -> {
             Editable username = mBinding.username.getText();
             Editable password = mBinding.password.getText();
-            // TODO: Check for null values
+
+            if (username.toString().isEmpty()) {
+                Toast.makeText(this, "Username must not be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (password.toString().isEmpty()) {
+                Toast.makeText(this, "Password must not be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             loginUser(username.toString(), password.toString());
 
