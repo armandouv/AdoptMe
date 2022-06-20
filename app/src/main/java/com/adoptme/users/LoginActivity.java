@@ -1,5 +1,6 @@
 package com.adoptme.users;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.widget.Toast;
@@ -24,7 +25,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(mBinding.getRoot());
 
         if (ParseUser.getCurrentUser() != null) {
-            // TODO: Go to TimelineActivity
+            // TODO: Go to Main Activity
         }
 
         mBinding.loginButton.setOnClickListener((view) -> {
@@ -39,7 +40,8 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         mBinding.goSignupButton.setOnClickListener(v -> {
-            // TODO: Go to sign up activity
+            Intent intent = new Intent(this, SignupActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -51,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             Toast.makeText(this, "Success!", Toast.LENGTH_SHORT).show();
-            // TODO: Go to timeline activity.
+            // TODO: Go to Main Activity
             finish();
         });
     }
