@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.adoptme.MainActivity;
 import com.adoptme.databinding.ActivityLoginBinding;
 import com.parse.ParseUser;
 
@@ -25,7 +26,9 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(mBinding.getRoot());
 
         if (ParseUser.getCurrentUser() != null) {
-            // TODO: Go to Main Activity
+            goMainActivity();
+            finish();
+            return;
         }
 
         mBinding.loginButton.setOnClickListener((view) -> {
@@ -62,8 +65,13 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             Toast.makeText(this, "Success!", Toast.LENGTH_SHORT).show();
-            // TODO: Go to Main Activity
+            goMainActivity();
             finish();
         });
+    }
+
+    private void goMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 }

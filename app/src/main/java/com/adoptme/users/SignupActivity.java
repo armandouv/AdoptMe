@@ -1,11 +1,13 @@
 package com.adoptme.users;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.adoptme.MainActivity;
 import com.adoptme.databinding.ActivitySignupBinding;
 import com.parse.ParseUser;
 
@@ -23,7 +25,10 @@ public class SignupActivity extends AppCompatActivity {
         setContentView(mBinding.getRoot());
 
         if (ParseUser.getCurrentUser() != null) {
-            // TODO: Go to Main Activity
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+            return;
         }
 
         mBinding.signupButton.setOnClickListener((view) -> {
@@ -59,7 +64,10 @@ public class SignupActivity extends AppCompatActivity {
             }
 
             Toast.makeText(this, "Success!", Toast.LENGTH_SHORT).show();
-            // TODO: Go to Main Activity
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
         });
     }
 }
