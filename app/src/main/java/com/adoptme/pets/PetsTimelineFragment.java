@@ -11,9 +11,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.adoptme.R;
 import com.adoptme.databinding.FragmentPetsTimelineBinding;
+import com.adoptme.pets.preferences.PreferencesMenuFragment;
 import com.adoptme.users.LoginActivity;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -76,6 +79,15 @@ public class PetsTimelineFragment extends Fragment {
                     Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
                     goLoginActivity();
                 }));
+
+        mBinding.preferencesButton.setOnClickListener(v -> {
+            PreferencesMenuFragment fragment = new PreferencesMenuFragment();
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.replace(R.id.container, fragment);
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            transaction.addToBackStack(null);
+            transaction.commit();
+        });
 
         mPetsAdapter = new PetsAdapter(getContext(), mPets, (v, position) -> {
             // TODO: Go to PetDetailsActivity
