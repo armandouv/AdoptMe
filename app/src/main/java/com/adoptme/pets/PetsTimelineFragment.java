@@ -67,7 +67,7 @@ public class PetsTimelineFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onViewCreated(view, savedInstanceState);
 
         mBinding.logoutButton.setOnClickListener(v ->
                 ParseUser.logOutInBackground(e -> {
