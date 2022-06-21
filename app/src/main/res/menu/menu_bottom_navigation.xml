@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/home_icon"
+        android:icon="@drawable/ic_baseline_home_24"
+        android:title="@string/home"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/pets_icon"
+        android:icon="@drawable/ic_baseline_pets_24"
+        android:title="@string/pets"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/pets_map_icon"
+        android:icon="@drawable/ic_baseline_location_searching_24"
+        android:title="@string/pets_map"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/compose_icon"
+        android:icon="@drawable/ic_baseline_edit_24"
+        android:title="@string/compose"
+        app:showAsAction="always" />
+</menu>
