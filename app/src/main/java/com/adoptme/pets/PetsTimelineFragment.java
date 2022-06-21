@@ -38,7 +38,7 @@ public class PetsTimelineFragment extends Fragment {
         // Required empty public constructor
     }
 
-    protected void populateHomeTimeline(boolean isRefreshing) {
+    protected void populatePets(boolean isRefreshing) {
         ParseQuery<Pet> query = ParseQuery.getQuery(Pet.class);
         query.setLimit(500);
         query.addDescendingOrder("createdAt");
@@ -93,7 +93,7 @@ public class PetsTimelineFragment extends Fragment {
             // TODO: Go to PetDetailsActivity
         });
 
-        mBinding.swipeContainer.setOnRefreshListener(() -> populateHomeTimeline(true));
+        mBinding.swipeContainer.setOnRefreshListener(() -> populatePets(true));
 
         mBinding.swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -102,7 +102,9 @@ public class PetsTimelineFragment extends Fragment {
 
         mBinding.postsView.setLayoutManager(new LinearLayoutManager(getContext()));
         mBinding.postsView.setAdapter(mPetsAdapter);
-        populateHomeTimeline(false);
+
+        // Only populate timeline once (refreshing will update it)
+        if (mPets.isEmpty()) populatePets(false);
     }
 
     @Override
