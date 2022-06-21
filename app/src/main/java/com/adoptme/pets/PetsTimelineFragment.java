@@ -1,65 +1,103 @@
 package com.adoptme.pets;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.adoptme.R;
+import com.adoptme.databinding.FragmentPetsTimelineBinding;
+import com.adoptme.users.LoginActivity;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link PetsTimelineFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Displays the 500 most recent Posts.
  */
 public class PetsTimelineFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    public static final String TAG = PetsTimelineFragment.class.getSimpleName();
+    protected final List<Pet> mPets = new ArrayList<>();
+    protected FragmentPetsTimelineBinding mBinding;
+    protected PetsAdapter mPetsAdapter;
 
     public PetsTimelineFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PetsTimelineFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PetsTimelineFragment newInstance(String param1, String param2) {
-        PetsTimelineFragment fragment = new PetsTimelineFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    protected void populateHomeTimeline(boolean isRefreshing) {
+        ParseQuery<Pet> query = ParseQuery.getQuery(Pet.class);
+        query.setLimit(500);
+        query.addDescendingOrder("createdAt");
+
+        query.findInBackground((posts, e) -> {
+            if (e != null) {
+                Log.e(TAG, "Could not query pet", e);
+                return;
+            }
+
+            if (isRefreshing) {
+                mPets.clear();
+                mBinding.swipeContainer.setRefreshing(false);
+            }
+            mPets.addAll(posts);
+            mPetsAdapter.notifyDataSetChanged();
+        });
     }
 
+    private void goLoginActivity() {
+        Intent intent = new Intent(getContext(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
+
+
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
+        mBinding.logoutButton.setOnClickListener(v ->
+                ParseUser.logOutInBackground(e -> {
+                    if (e != null) {
+                        Toast.makeText(getContext(), "Couldn't log out", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                    goLoginActivity();
+                }));
+
+        mPetsAdapter = new PetsAdapter(getContext(), mPets, (v, position) -> {
+            // TODO: Go to PetDetailsActivity
+        });
+
+        mBinding.swipeContainer.setOnRefreshListener(() -> populateHomeTimeline(true));
+
+        mBinding.swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
+        mBinding.postsView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mBinding.postsView.setAdapter(mPetsAdapter);
+        populateHomeTimeline(false);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_pets_timeline, container, false);
+        mBinding = FragmentPetsTimelineBinding.inflate(getLayoutInflater());
+        return mBinding.getRoot();
     }
 }

@@ -8,4 +8,7 @@
     <string name="pets">Pets</string>
     <string name="pets_map">Pets map</string>
     <string name="compose">Post Pet</string>
+    <string name="log_out">Log out</string>
+    <string name="pet_photo">Pet photo</string>
+    <string name="preferences">Preferences</string>
 </resources>
