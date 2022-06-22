@@ -1,6 +1,5 @@
 package com.adoptme.pets;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -58,13 +57,6 @@ public class PetsTimelineFragment extends Fragment {
         });
     }
 
-    private void goLoginActivity() {
-        Intent intent = new Intent(getContext(), LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-    }
-
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -77,7 +69,7 @@ public class PetsTimelineFragment extends Fragment {
                     }
 
                     Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
-                    goLoginActivity();
+                    LoginActivity.launchAndClear(getActivity());
                 }));
 
         mBinding.preferencesButton.setOnClickListener(v -> {

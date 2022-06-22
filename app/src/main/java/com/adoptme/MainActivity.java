@@ -1,5 +1,7 @@
 package com.adoptme;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,5 +46,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
         binding.bottomNavigation.setSelectedItemId(R.id.home_icon);
+    }
+
+    /**
+     * Starts the MainActivity and clears all previously started activities.
+     *
+     * @param activity The source activity in which the MainActivity will start.
+     */
+    public static void launchAndClear(Activity activity) {
+        Intent intent = new Intent(activity, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        activity.startActivity(intent);
     }
 }

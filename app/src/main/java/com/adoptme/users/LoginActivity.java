@@ -1,5 +1,6 @@
 package com.adoptme.users;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,6 +19,17 @@ public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding mBinding;
 
+    /**
+     * Starts the LoginActivity and clears all previously started activities.
+     *
+     * @param activity The source activity in which the LoginActivity will start.
+     */
+    public static void launchAndClear(Activity activity) {
+        Intent intent = new Intent(activity, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        activity.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,8 +38,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(mBinding.getRoot());
 
         if (ParseUser.getCurrentUser() != null) {
-            goMainActivity();
-            finish();
+            MainActivity.launchAndClear(this);
             return;
         }
 
@@ -51,10 +62,7 @@ public class LoginActivity extends AppCompatActivity {
             password.clear();
         });
 
-        mBinding.goSignupButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, SignupActivity.class);
-            startActivity(intent);
-        });
+        mBinding.goSignupButton.setOnClickListener(v -> SignupActivity.launch(this));
     }
 
     private void loginUser(String username, String password) {
@@ -65,13 +73,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             Toast.makeText(this, "Success!", Toast.LENGTH_SHORT).show();
-            goMainActivity();
-            finish();
+            MainActivity.launchAndClear(this);
         });
-    }
-
-    private void goMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
     }
 }
