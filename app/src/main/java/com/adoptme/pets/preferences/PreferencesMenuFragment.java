@@ -4,62 +4,65 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.adoptme.R;
+import com.adoptme.databinding.FragmentPreferencesMenuBinding;
+import com.woxthebox.draglistview.DragListView;
+
+import java.util.List;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link PreferencesMenuFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * A drag-and-drop menu where users can specify their pet preferences. Each attribute will be
+ * assigned a priority that can be changed by dragging and dropping the attribute to change its
+ * order.
  */
 public class PreferencesMenuFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    protected final List<PetAttribute> mAttributes = PetAttribute.getDefaultAttributes();
+    protected FragmentPreferencesMenuBinding mBinding;
+    protected PreferencesAdapter mAdapter;
 
     public PreferencesMenuFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PreferencesMenuFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PreferencesMenuFragment newInstance(String param1, String param2) {
-        PreferencesMenuFragment fragment = new PreferencesMenuFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mAdapter = new PreferencesAdapter(mAttributes, R.id.attribute, true);
+        mBinding.dragListView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mBinding.dragListView.setAdapter(mAdapter, true);
+        mBinding.dragListView.setCanDragHorizontally(false);
+        mBinding.dragListView.setCanDragVertically(true);
+
+        mBinding.dragListView.getRecyclerView().setVerticalScrollBarEnabled(true);
+        mBinding.dragListView.setDragListListener(new DragListView.DragListListenerAdapter() {
+            @Override
+            public void onItemDragStarted(int position) {
+                Toast.makeText(mBinding.dragListView.getContext(), "Start - position: " + position, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onItemDragEnded(int fromPosition, int toPosition) {
+                if (fromPosition != toPosition) {
+                    Toast.makeText(mBinding.dragListView.getContext(), "End - position: " + toPosition, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_preferences_menu, container, false);
+        mBinding = FragmentPreferencesMenuBinding.inflate(getLayoutInflater());
+        return mBinding.getRoot();
     }
 }

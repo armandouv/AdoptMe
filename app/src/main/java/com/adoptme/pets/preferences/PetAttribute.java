@@ -3,6 +3,9 @@ package com.adoptme.pets.preferences;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a pet attribute with an assigned value, which could be none (the empty string).
+ */
 public class PetAttribute {
     private String mName;
     private String mAssignedValue;
