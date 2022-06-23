@@ -11,4 +11,6 @@
     <string name="log_out">Log out</string>
     <string name="pet_photo">Pet photo</string>
     <string name="preferences">Preferences</string>
+    <string name="value">Value</string>
+    <string name="save">Save</string>
 </resources>
