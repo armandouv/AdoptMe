@@ -15,13 +15,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.adoptme.R;
 import com.adoptme.databinding.FragmentPetsTimelineBinding;
+import com.adoptme.pets.preferences.PetAttribute;
 import com.adoptme.pets.preferences.PreferencesMenuFragment;
 import com.adoptme.users.LoginActivity;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Displays the 500 most recent Posts.
@@ -61,6 +64,8 @@ public class PetsTimelineFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        sortPetsByPreferences();
+
         mBinding.logoutButton.setOnClickListener(v ->
                 ParseUser.logOutInBackground(e -> {
                     if (e != null) {
@@ -97,6 +102,44 @@ public class PetsTimelineFragment extends Fragment {
 
         // Only populate timeline once (refreshing will update it)
         if (mPets.isEmpty()) populatePets(false);
+    }
+
+    private void sortPetsByPreferences() {
+        Map<Pet, Integer> scores = computePetScores();
+
+        // Sort in decreasing order by score (the larger the score is, the better the match with
+        // user preferences). If a Pet does not have a score assigned in the map, it will be 0 by
+        // default.
+        mPets.sort((pet1, pet2) -> scores.get(pet2) - scores.get(pet1));
+    }
+
+    private Map<Pet, Integer> computePetScores() {
+        Map<Pet, Integer> scores = new HashMap<>();
+
+        for (Pet pet : mPets) {
+            // Since attribute names in PetAttribute are not hardcoded, we first need to convert
+            // each Pet's attributes to a map (attributeName -> attributeValue), so that we can
+            // compare their values.
+            Map<String, String> petAttributes = pet.getPreferencesAttributesMap();
+
+            int score = 0, increase = 2;
+            for (PetAttribute attribute : PreferencesMenuFragment.sAttributes) {
+                // If the attribute was not assigned a value it will not increase the score.
+                if (attribute.isAssignedValueEmpty()) continue;
+
+                // Check if the preferred attribute value matches the pet's value. If it doesn't,
+                // it will not increase the score.
+                String petAttributeValue = petAttributes.get(attribute.getName());
+                if (!attribute.getAssignedValue().equals(petAttributeValue)) continue;
+
+                // Increase score according to the attribute's position.
+                score += increase;
+                increase *= 2;
+            }
+            scores.put(pet, score);
+        }
+
+        return scores;
     }
 
     @Override
