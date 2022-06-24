@@ -130,8 +130,10 @@ public class PetsTimelineFragment extends Fragment {
             // compare their values.
             Map<String, String> petAttributes = pet.getPreferencesAttributesMap();
 
-            int score = 0, increase = 2;
+            int score = 0, increase = (int) Math.pow(2, PreferencesMenuFragment.sAttributes.size() + 1);
             for (PetAttribute attribute : PreferencesMenuFragment.sAttributes) {
+                increase /= 2;
+
                 // If the attribute was not assigned a value it will not increase the score.
                 if (attribute.isAssignedValueEmpty()) continue;
 
@@ -142,7 +144,6 @@ public class PetsTimelineFragment extends Fragment {
 
                 // Increase score according to the attribute's position.
                 score += increase;
-                increase *= 2;
             }
             scores.put(pet, score);
         }
