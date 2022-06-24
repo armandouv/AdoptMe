@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.adoptme.R;
 import com.adoptme.databinding.FragmentPreferencesMenuBinding;
-import com.woxthebox.draglistview.DragListView;
 
 import java.util.List;
 
@@ -43,19 +41,6 @@ public class PreferencesMenuFragment extends Fragment {
         mBinding.dragListView.setCanDragVertically(true);
 
         mBinding.dragListView.getRecyclerView().setVerticalScrollBarEnabled(true);
-        mBinding.dragListView.setDragListListener(new DragListView.DragListListenerAdapter() {
-            @Override
-            public void onItemDragStarted(int position) {
-                Toast.makeText(mBinding.dragListView.getContext(), "Start - position: " + position, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onItemDragEnded(int fromPosition, int toPosition) {
-                if (fromPosition != toPosition) {
-                    Toast.makeText(mBinding.dragListView.getContext(), "End - position: " + toPosition, Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
     }
 
     @Override
