@@ -56,6 +56,9 @@ public class PetsTimelineFragment extends Fragment {
                 mBinding.swipeContainer.setRefreshing(false);
             }
             mPets.addAll(posts);
+            // Sort after data arrives
+            sortPetsByPreferences();
+
             mPetsAdapter.notifyDataSetChanged();
         });
     }
@@ -63,8 +66,6 @@ public class PetsTimelineFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        sortPetsByPreferences();
 
         mBinding.logoutButton.setOnClickListener(v ->
                 ParseUser.logOutInBackground(e -> {
@@ -100,8 +101,15 @@ public class PetsTimelineFragment extends Fragment {
         mBinding.postsView.setLayoutManager(new LinearLayoutManager(getContext()));
         mBinding.postsView.setAdapter(mPetsAdapter);
 
-        // Only populate timeline once (refreshing will update it)
-        if (mPets.isEmpty()) populatePets(false);
+        // Only populate timeline once (refreshing will update it if needed)
+        if (mPets.isEmpty()) {
+            // Note: sorting is done inside populatePets after data arrives.
+            populatePets(false);
+            return;
+        }
+
+        // Sort existing data
+        sortPetsByPreferences();
     }
 
     private void sortPetsByPreferences() {
