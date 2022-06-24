@@ -6,6 +6,11 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Represents a Pet for adoption.
  */
@@ -109,5 +114,28 @@ public class Pet extends ParseObject {
 
     public void setUser(ParseUser user) {
         put(KEY_USER, user);
+    }
+
+    public static List<String> getPreferencesAttributes() {
+        List<String> attributes = new ArrayList<>();
+
+        attributes.add(KEY_TYPE);
+        attributes.add(KEY_SIZE);
+        attributes.add(KEY_GENDER);
+        attributes.add(KEY_AGE);
+        attributes.add(KEY_COLOR);
+        attributes.add(KEY_BREED);
+
+        return attributes;
+    }
+
+    public Map<String, String> getPreferencesAttributesMap() {
+        Map<String, String> attributes = new HashMap<>();
+
+        for (String attributeName : Pet.getPreferencesAttributes()) {
+            attributes.put(attributeName, getString(attributeName));
+        }
+
+        return attributes;
     }
 }

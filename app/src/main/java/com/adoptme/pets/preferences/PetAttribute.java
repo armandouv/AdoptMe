@@ -1,5 +1,7 @@
 package com.adoptme.pets.preferences;
 
+import com.adoptme.pets.Pet;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,12 +24,10 @@ public class PetAttribute {
 
     public static List<PetAttribute> getDefaultAttributes() {
         List<PetAttribute> attributes = new ArrayList<>();
-        attributes.add(new PetAttribute("type"));
-        attributes.add(new PetAttribute("size"));
-        attributes.add(new PetAttribute("gender"));
-        attributes.add(new PetAttribute("age"));
-        attributes.add(new PetAttribute("color"));
-        attributes.add(new PetAttribute("breed"));
+
+        for (String attributeName : Pet.getPreferencesAttributes())
+            attributes.add(new PetAttribute(attributeName));
+
         return attributes;
     }
 
@@ -45,5 +45,9 @@ public class PetAttribute {
 
     public void setAssignedValue(String assignedValue) {
         mAssignedValue = assignedValue;
+    }
+
+    public boolean isAssignedValueEmpty() {
+        return mAssignedValue.isEmpty();
     }
 }
