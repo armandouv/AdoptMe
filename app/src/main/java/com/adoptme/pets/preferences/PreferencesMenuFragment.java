@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class PreferencesMenuFragment extends Fragment {
 
-    private static final List<PetAttribute> mAttributes = PetAttribute.getDefaultAttributes();
+    public static final List<PetAttribute> sAttributes = PetAttribute.getDefaultAttributes();
     protected FragmentPreferencesMenuBinding mBinding;
     protected PreferencesAdapter mAdapter;
 
@@ -36,7 +36,7 @@ public class PreferencesMenuFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAdapter = new PreferencesAdapter(mAttributes, R.id.attribute, true);
+        mAdapter = new PreferencesAdapter(sAttributes, R.id.attribute, true);
         mBinding.dragListView.setLayoutManager(new LinearLayoutManager(getContext()));
         mBinding.dragListView.setAdapter(mAdapter, true);
         mBinding.dragListView.setCanDragHorizontally(false);
