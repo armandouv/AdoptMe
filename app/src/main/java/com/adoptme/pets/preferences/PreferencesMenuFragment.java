@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class PreferencesMenuFragment extends Fragment {
 
-    protected final List<PetAttribute> mAttributes = PetAttribute.getDefaultAttributes();
+    private static final List<PetAttribute> mAttributes = PetAttribute.getDefaultAttributes();
     protected FragmentPreferencesMenuBinding mBinding;
     protected PreferencesAdapter mAdapter;
 

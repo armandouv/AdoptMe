@@ -1,5 +1,7 @@
 package com.adoptme.pets.preferences;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +59,21 @@ public class PreferencesAdapter extends DragItemAdapter<PetAttribute, DragItemAd
 
         public void bind(PetAttribute attribute) {
             mBinding.attribute.setHint(attribute.getName());
+            mBinding.attribute.setText(attribute.getAssignedValue());
+            mBinding.attribute.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    attribute.setAssignedValue(s.toString());
+                }
+            });
         }
     }
 }
