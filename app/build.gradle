@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
 def apikeyPropertiesFile = rootProject.file("apikey.properties")
@@ -56,4 +57,6 @@ dependencies {
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
     implementation 'com.github.woxthebox:draglistview:1.7.2'
+
+    implementation 'com.google.android.gms:play-services-maps:18.0.2'
 }
