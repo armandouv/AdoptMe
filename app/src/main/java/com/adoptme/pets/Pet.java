@@ -138,4 +138,41 @@ public class Pet extends ParseObject {
 
         return attributes;
     }
+
+    private String getFormatted(String value) {
+        if (value.isEmpty()) return value;
+        return Character.toUpperCase(value.charAt(0)) + value.substring(1);
+    }
+
+    public String getFormattedType() {
+        return getFormatted(getType());
+    }
+
+    public String getFormattedSize() {
+        return getFormatted(getSize());
+    }
+
+    public String getFormattedGender() {
+        return getFormatted(getGender());
+    }
+
+    public String getFormattedAge() {
+        return getFormatted(getAge());
+    }
+
+    public String getFormattedName() {
+        return getFormatted(getName());
+    }
+
+    public String getFormattedBreed() {
+        return getFormatted(getBreed());
+    }
+
+    public String getFormattedDescription() {
+        return getFormatted(getDescription());
+    }
+
+    public String getFormattedColor() {
+        return getFormatted(getColor());
+    }
 }

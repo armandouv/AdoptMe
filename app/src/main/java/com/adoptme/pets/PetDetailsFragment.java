@@ -45,18 +45,18 @@ public class PetDetailsFragment extends Fragment {
 
         Pet pet = this.getArguments().getParcelable(Pet.class.getSimpleName());
 
-        mBinding.petName.setText(pet.getName());
+        mBinding.petName.setText(pet.getFormattedName());
         Glide.with(requireContext())
                 .load(pet.getPhoto().getUrl())
                 .into(mBinding.petPhoto);
-        mBinding.petType.setText(pet.getType());
-        mBinding.petSize.setText(pet.getSize());
-        mBinding.petGender.setText(pet.getGender());
-        mBinding.petAge.setText(pet.getAge());
-        mBinding.petColor.setText(pet.getColor());
-        mBinding.petBreed.setText(pet.getBreed());
+        mBinding.petType.setText(pet.getFormattedType());
+        mBinding.petSize.setText(pet.getFormattedSize());
+        mBinding.petGender.setText(pet.getFormattedGender());
+        mBinding.petAge.setText(pet.getFormattedAge());
+        mBinding.petColor.setText(pet.getFormattedColor());
+        mBinding.petBreed.setText(pet.getFormattedBreed());
         // Location
-        mBinding.petDescription.setText(pet.getDescription());
+        mBinding.petDescription.setText(pet.getFormattedDescription());
     }
 
     @Override
