@@ -10,10 +10,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.adoptme.R;
 import com.adoptme.databinding.FragmentPetsTimelineBinding;
 import com.adoptme.pets.preferences.PetAttribute;
 import com.adoptme.pets.preferences.PreferencesMenuFragment;
@@ -82,7 +80,8 @@ public class PetsTimelineFragment extends Fragment {
                 PreferencesMenuFragment.launch(getFragmentManager()));
 
         mPetsAdapter = new PetsAdapter(getContext(), mPets, (v, position) -> {
-            // TODO: Go to PetDetailsActivity
+            Pet pet = mPets.get(position);
+            PetDetailsFragment.launch(getFragmentManager(), pet);
         });
 
         mBinding.swipeContainer.setOnRefreshListener(() -> populatePets(true));
