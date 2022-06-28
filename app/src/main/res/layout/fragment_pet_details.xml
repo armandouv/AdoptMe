@@ -29,9 +29,9 @@
             android:layout_marginTop="24dp"
             android:text="@string/test"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintHorizontal_bias="0.501"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pet_type" />
+            app:layout_constraintTop_toBottomOf="@+id/pet_breed" />
 
         <TextView
             android:id="@+id/pet_color"
@@ -59,31 +59,32 @@
             android:id="@+id/pet_breed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/test"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.501"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pet_location" />
-
-        <TextView
-            android:id="@+id/pet_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="32dp"
             android:text="@string/test"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pet_gender" />
+            app:layout_constraintTop_toBottomOf="@+id/pet_location" />
+
+        <fragment
+            android:id="@+id/pet_location"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="224dp"
+            android:layout_height="187dp"
+            android:layout_marginTop="32dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pet_type" />
 
         <TextView
             android:id="@+id/pet_type"
             android:layout_width="wrap_content"
             android:layout_height="19dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="20dp"
             android:text="@string/test"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pet_name" />
 

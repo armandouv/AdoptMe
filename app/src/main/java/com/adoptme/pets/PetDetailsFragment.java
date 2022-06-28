@@ -14,6 +14,11 @@ import androidx.fragment.app.FragmentTransaction;
 import com.adoptme.R;
 import com.adoptme.databinding.FragmentPetDetailsBinding;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.parse.ParseGeoPoint;
 
 /**
  * Displays a detailed view of a Pet.
@@ -55,7 +60,20 @@ public class PetDetailsFragment extends Fragment {
         mBinding.petAge.setText(pet.getFormattedAge());
         mBinding.petColor.setText(pet.getFormattedColor());
         mBinding.petBreed.setText(pet.getFormattedBreed());
-        // Location
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
+                .findFragmentById(R.id.pet_location);
+        mapFragment.getMapAsync(googleMap -> {
+            ParseGeoPoint location = pet.getLocation();
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            googleMap.addMarker(new MarkerOptions()
+                    .position(latLng)
+                    .title("Pet location"));
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+        });
+
         mBinding.petDescription.setText(pet.getFormattedDescription());
     }
 
