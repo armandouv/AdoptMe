@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.adoptme.R;
@@ -49,5 +51,14 @@ public class PreferencesMenuFragment extends Fragment {
         // Inflate the layout for this fragment
         mBinding = FragmentPreferencesMenuBinding.inflate(getLayoutInflater());
         return mBinding.getRoot();
+    }
+
+    public static void launch(FragmentManager fragmentManager) {
+        PreferencesMenuFragment fragment = new PreferencesMenuFragment();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 }

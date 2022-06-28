@@ -78,14 +78,8 @@ public class PetsTimelineFragment extends Fragment {
                     LoginActivity.launchAndClear(getActivity());
                 }));
 
-        mBinding.preferencesButton.setOnClickListener(v -> {
-            PreferencesMenuFragment fragment = new PreferencesMenuFragment();
-            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.container, fragment);
-            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            transaction.addToBackStack(null);
-            transaction.commit();
-        });
+        mBinding.preferencesButton.setOnClickListener(v ->
+                PreferencesMenuFragment.launch(getFragmentManager()));
 
         mPetsAdapter = new PetsAdapter(getContext(), mPets, (v, position) -> {
             // TODO: Go to PetDetailsActivity
