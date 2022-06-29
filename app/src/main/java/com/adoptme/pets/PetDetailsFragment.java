@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +20,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 /**
@@ -27,6 +29,7 @@ import com.parse.ParseUser;
 public class PetDetailsFragment extends Fragment {
 
     private FragmentPetDetailsBinding mBinding;
+    private Pet mPet;
 
     public PetDetailsFragment() {
         // Required empty public constructor
@@ -49,26 +52,26 @@ public class PetDetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Pet pet = this.getArguments().getParcelable(Pet.class.getSimpleName());
+        mPet = this.getArguments().getParcelable(Pet.class.getSimpleName());
 
-        setLikes(pet);
-        setUserLiked(pet);
-        mBinding.petName.setText(pet.getFormattedName());
+        setUpLikesFunctionality();
+
+        mBinding.petName.setText(mPet.getFormattedName());
         Glide.with(requireContext())
-                .load(pet.getPhoto().getUrl())
+                .load(mPet.getPhoto().getUrl())
                 .into(mBinding.petPhoto);
-        mBinding.petType.setText(pet.getFormattedType());
-        mBinding.petSize.setText(pet.getFormattedSize());
-        mBinding.petGender.setText(pet.getFormattedGender());
-        mBinding.petAge.setText(pet.getFormattedAge());
-        mBinding.petColor.setText(pet.getFormattedColor());
-        mBinding.petBreed.setText(pet.getFormattedBreed());
+        mBinding.petType.setText(mPet.getFormattedType());
+        mBinding.petSize.setText(mPet.getFormattedSize());
+        mBinding.petGender.setText(mPet.getFormattedGender());
+        mBinding.petAge.setText(mPet.getFormattedAge());
+        mBinding.petColor.setText(mPet.getFormattedColor());
+        mBinding.petBreed.setText(mPet.getFormattedBreed());
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.pet_location);
         mapFragment.getMapAsync(googleMap -> {
-            ParseGeoPoint location = pet.getLocation();
+            ParseGeoPoint location = mPet.getLocation();
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
             googleMap.addMarker(new MarkerOptions()
                     .position(latLng)
@@ -77,7 +80,7 @@ public class PetDetailsFragment extends Fragment {
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
         });
 
-        mBinding.petDescription.setText(pet.getFormattedDescription());
+        mBinding.petDescription.setText(mPet.getFormattedDescription());
     }
 
     @Override
@@ -88,18 +91,59 @@ public class PetDetailsFragment extends Fragment {
         return mBinding.getRoot();
     }
 
-    private void setUserLiked(Pet pet) {
+    private void toggleLike(View view) {
+        ParseRelation<ParseUser> relation = mPet.getRelation("users");
         ParseUser user = ParseUser.getCurrentUser();
-        pet.getRelation("users").getQuery()
-                .whereEqualTo(ParseUser.KEY_OBJECT_ID, user.getObjectId())
-                .countInBackground((count, e) ->
-                        mBinding.likeButton.setImageResource(count == 0 ?
-                                R.drawable.heart_outline : R.drawable.heart_filled));
+        int likesCount = mPet.getLikesCount();
+
+        if (mPet.isUserLiked()) {
+            relation.remove(user);
+            mPet.setLikesCount(likesCount - 1);
+        } else {
+            relation.add(user);
+            mPet.setLikesCount(likesCount + 1);
+        }
+
+        mPet.saveInBackground(e -> {
+            if (e != null)
+                Toast.makeText(getContext(),
+                        "Error while liking or unliking the pet", Toast.LENGTH_SHORT).show();
+
+            mPet.toggleIsUserLiked();
+            mBinding.petLikes.setText(getString(R.string.likes, mPet.getLikesCount()));
+            mBinding.likeButton.setImageResource(mPet.isUserLiked() ?
+                    R.drawable.heart_filled : R.drawable.heart_outline);
+        });
     }
 
-    private void setLikes(Pet pet) {
-        pet.getRelation("users").getQuery()
-                .countInBackground((likesCount, e1) ->
-                        mBinding.petLikes.setText(getString(R.string.likes, likesCount)));
+    /**
+     * Sets up likes functionality as follows:
+     * 1. Load whether the current user has liked the pet.
+     * 2. Load the number of likes the pet has.
+     * 3. Set up like toggling. This is done at the end because when a like is toggled, the liked
+     * status will change, as well as the number of likes the pet has. Thus, these data must be
+     * known before the updates happen.
+     */
+    private void setUpLikesFunctionality() {
+        ParseUser user = ParseUser.getCurrentUser();
+        mPet.getRelation("users").getQuery()
+                .whereEqualTo(ParseUser.KEY_OBJECT_ID, user.getObjectId())
+                .countInBackground((count, e) -> {
+                    mPet.setUserLiked(count == 1);
+                    mBinding.likeButton.setImageResource(mPet.isUserLiked() ?
+                            R.drawable.heart_filled : R.drawable.heart_outline);
+
+                    setLikesCount();
+                });
+    }
+
+    private void setLikesCount() {
+        mPet.getRelation("users").getQuery()
+                .countInBackground((likesCount, e1) -> {
+                    mPet.setLikesCount(likesCount);
+                    mBinding.petLikes.setText(getString(R.string.likes, likesCount));
+                    // Allow user to toggle like only after loading the current liked state and likes count.
+                    mBinding.likeButton.setOnClickListener(this::toggleLike);
+                });
     }
 }
