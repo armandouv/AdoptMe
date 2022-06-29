@@ -26,8 +26,8 @@
             android:id="@+id/pet_likes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="52dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginStart="92dp"
+            android:layout_marginTop="16dp"
             android:text="@string/likes"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pet_photo" />
@@ -81,7 +81,7 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="224dp"
             android:layout_height="187dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
@@ -105,10 +105,10 @@
             android:text="@string/test"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.501"
+            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pet_photo"
-            app:layout_constraintVertical_bias="0.038" />
+            app:layout_constraintVertical_bias="0.085" />
 
         <TextView
             android:id="@+id/pet_size"
@@ -129,6 +129,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pet_size" />
+
+        <ImageButton
+            android:id="@+id/like_button"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="#00FFFFFF"
+            android:contentDescription="@string/like_button"
+            android:src="@drawable/heart_outline"
+            app:layout_constraintEnd_toStartOf="@+id/pet_likes"
+            app:layout_constraintTop_toBottomOf="@+id/pet_photo" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

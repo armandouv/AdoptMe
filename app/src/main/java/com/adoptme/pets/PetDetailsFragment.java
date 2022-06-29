@@ -19,6 +19,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseUser;
 
 /**
  * Displays a detailed view of a Pet.
@@ -51,6 +52,7 @@ public class PetDetailsFragment extends Fragment {
         Pet pet = this.getArguments().getParcelable(Pet.class.getSimpleName());
 
         setLikes(pet);
+        setUserLiked(pet);
         mBinding.petName.setText(pet.getFormattedName());
         Glide.with(requireContext())
                 .load(pet.getPhoto().getUrl())
@@ -84,6 +86,15 @@ public class PetDetailsFragment extends Fragment {
         // Inflate the layout for this fragment
         mBinding = FragmentPetDetailsBinding.inflate(getLayoutInflater());
         return mBinding.getRoot();
+    }
+
+    private void setUserLiked(Pet pet) {
+        ParseUser user = ParseUser.getCurrentUser();
+        pet.getRelation("users").getQuery()
+                .whereEqualTo(ParseUser.KEY_OBJECT_ID, user.getObjectId())
+                .countInBackground((count, e) ->
+                        mBinding.likeButton.setImageResource(count == 0 ?
+                                R.drawable.heart_outline : R.drawable.heart_filled));
     }
 
     private void setLikes(Pet pet) {

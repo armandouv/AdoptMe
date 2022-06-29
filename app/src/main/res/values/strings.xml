@@ -15,4 +15,5 @@
     <string name="save">Save</string>
     <string name="test">test</string>
     <string name="likes">%d likes</string>
+    <string name="like_button">Like button</string>
 </resources>
