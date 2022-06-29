@@ -111,7 +111,7 @@ public class PetsTimelineFragment extends Fragment {
         // Sort in decreasing order by score (the larger the score is, the better the match with
         // user preferences). If a Pet does not have a score assigned in the map, it will be 0 by
         // default.
-        mPets.sort((pet1, pet2) -> scores.get(pet2) - scores.get(pet1));
+        Sorting.sort(mPets, (pet1, pet2) -> scores.get(pet2) - scores.get(pet1));
     }
 
     private Map<Pet, Integer> computePetScores() {
