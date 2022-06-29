@@ -23,6 +23,16 @@
             tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
+            android:id="@+id/pet_likes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="52dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/likes"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pet_photo" />
+
+        <TextView
             android:id="@+id/pet_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

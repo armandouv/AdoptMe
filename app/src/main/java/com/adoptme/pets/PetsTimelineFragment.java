@@ -43,9 +43,9 @@ public class PetsTimelineFragment extends Fragment {
         query.setLimit(500);
         query.addDescendingOrder("createdAt");
 
-        query.findInBackground((posts, e) -> {
+        query.findInBackground((pets, e) -> {
             if (e != null) {
-                Log.e(TAG, "Could not query pet", e);
+                Log.e(TAG, "Could not query pets", e);
                 return;
             }
 
@@ -53,7 +53,8 @@ public class PetsTimelineFragment extends Fragment {
                 mPets.clear();
                 mBinding.swipeContainer.setRefreshing(false);
             }
-            mPets.addAll(posts);
+
+            mPets.addAll(pets);
             // Sort after data arrives
             sortPetsByPreferences();
 

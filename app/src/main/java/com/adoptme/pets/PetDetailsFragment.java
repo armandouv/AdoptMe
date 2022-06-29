@@ -50,6 +50,7 @@ public class PetDetailsFragment extends Fragment {
 
         Pet pet = this.getArguments().getParcelable(Pet.class.getSimpleName());
 
+        setLikes(pet);
         mBinding.petName.setText(pet.getFormattedName());
         Glide.with(requireContext())
                 .load(pet.getPhoto().getUrl())
@@ -83,5 +84,13 @@ public class PetDetailsFragment extends Fragment {
         // Inflate the layout for this fragment
         mBinding = FragmentPetDetailsBinding.inflate(getLayoutInflater());
         return mBinding.getRoot();
+    }
+
+    private void setLikes(Pet pet) {
+        pet.getRelation("users").getQuery()
+                .countInBackground((likesCount, e1) -> {
+                    pet.setLikes(likesCount);
+                    mBinding.petLikes.setText(getString(R.string.likes, pet.getLikes()));
+                });
     }
 }
