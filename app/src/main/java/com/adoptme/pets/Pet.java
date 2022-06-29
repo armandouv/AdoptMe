@@ -28,16 +28,6 @@ public class Pet extends ParseObject {
     public static final String KEY_PHOTO = "photo";
     public static final String KEY_USER = "user";
 
-    private int likes;
-
-    public int getLikes() {
-        return likes;
-    }
-
-    public void setLikes(int likes) {
-        this.likes = likes;
-    }
-
     public String getType() {
         return getString(KEY_TYPE);
     }

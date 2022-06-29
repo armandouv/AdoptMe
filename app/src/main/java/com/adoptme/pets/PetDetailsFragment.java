@@ -88,9 +88,7 @@ public class PetDetailsFragment extends Fragment {
 
     private void setLikes(Pet pet) {
         pet.getRelation("users").getQuery()
-                .countInBackground((likesCount, e1) -> {
-                    pet.setLikes(likesCount);
-                    mBinding.petLikes.setText(getString(R.string.likes, pet.getLikes()));
-                });
+                .countInBackground((likesCount, e1) ->
+                        mBinding.petLikes.setText(getString(R.string.likes, likesCount)));
     }
 }
