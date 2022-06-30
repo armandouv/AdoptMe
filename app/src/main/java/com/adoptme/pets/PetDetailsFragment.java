@@ -1,7 +1,10 @@
 package com.adoptme.pets;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -30,24 +33,13 @@ public class PetDetailsFragment extends Fragment {
 
     private FragmentPetDetailsBinding mBinding;
     private Pet mPet;
+    private final GestureDetector mGestureDetector = new GestureDetector(getContext(), new DoubleTapListener());
 
     public PetDetailsFragment() {
         // Required empty public constructor
     }
 
-    public static void launch(FragmentManager fragmentManager, Pet pet) {
-        PetDetailsFragment fragment = new PetDetailsFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(Pet.class.getSimpleName(), pet);
-        fragment.setArguments(bundle);
-
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.container, fragment);
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -60,6 +52,9 @@ public class PetDetailsFragment extends Fragment {
         Glide.with(requireContext())
                 .load(mPet.getPhoto().getUrl())
                 .into(mBinding.petPhoto);
+
+        mBinding.petPhoto.setOnTouchListener((v, event) -> mGestureDetector.onTouchEvent(event));
+
         mBinding.petType.setText(mPet.getFormattedType());
         mBinding.petSize.setText(mPet.getFormattedSize());
         mBinding.petGender.setText(mPet.getFormattedGender());
@@ -83,15 +78,20 @@ public class PetDetailsFragment extends Fragment {
         mBinding.petDescription.setText(mPet.getFormattedDescription());
     }
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        mBinding = FragmentPetDetailsBinding.inflate(getLayoutInflater());
-        return mBinding.getRoot();
+    public static void launch(FragmentManager fragmentManager, Pet pet) {
+        PetDetailsFragment fragment = new PetDetailsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(Pet.class.getSimpleName(), pet);
+        fragment.setArguments(bundle);
+
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
-    private void toggleLike(View view) {
+    private void toggleLike() {
         ParseRelation<ParseUser> relation = mPet.getRelation("users");
         ParseUser user = ParseUser.getCurrentUser();
         int likesCount = mPet.getLikesCount();
@@ -116,6 +116,24 @@ public class PetDetailsFragment extends Fragment {
         });
     }
 
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        mBinding = FragmentPetDetailsBinding.inflate(getLayoutInflater());
+        return mBinding.getRoot();
+    }
+
+    private void setLikesCount() {
+        mPet.getRelation("users").getQuery()
+                .countInBackground((likesCount, e1) -> {
+                    mPet.setLikesCount(likesCount);
+                    mBinding.petLikes.setText(getString(R.string.likes, likesCount));
+                    // Allow user to toggle like only after loading the current liked state and likes count.
+                    mBinding.likeButton.setOnClickListener(view -> toggleLike());
+                });
+    }
+
     /**
      * Sets up likes functionality as follows:
      * 1. Load whether the current user has liked the pet.
@@ -137,13 +155,16 @@ public class PetDetailsFragment extends Fragment {
                 });
     }
 
-    private void setLikesCount() {
-        mPet.getRelation("users").getQuery()
-                .countInBackground((likesCount, e1) -> {
-                    mPet.setLikesCount(likesCount);
-                    mBinding.petLikes.setText(getString(R.string.likes, likesCount));
-                    // Allow user to toggle like only after loading the current liked state and likes count.
-                    mBinding.likeButton.setOnClickListener(this::toggleLike);
-                });
+    private class DoubleTapListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return true;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            toggleLike();
+            return true;
+        }
     }
 }
