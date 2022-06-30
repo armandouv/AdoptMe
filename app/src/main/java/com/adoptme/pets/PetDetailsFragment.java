@@ -71,8 +71,7 @@ public class PetDetailsFragment extends Fragment {
             googleMap.addMarker(new MarkerOptions()
                     .position(latLng)
                     .title("Pet location"));
-            googleMap.animateCamera(CameraUpdateFactory.zoomTo(10));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
         });
 
         mBinding.petDescription.setText(mPet.getFormattedDescription());

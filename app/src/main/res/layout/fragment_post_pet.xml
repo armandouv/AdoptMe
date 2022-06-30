@@ -1,14 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".pets.PostPetFragment">
+    android:layout_height="match_parent">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-</FrameLayout>
+        <EditText
+            android:id="@+id/input_type"
+            android:layout_width="376dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
+            android:autofillHints="Type"
+            android:ems="10"
+            android:hint="@string/type"
+            android:inputType="text"
+            tools:ignore="LabelFor" />
+
+        <EditText
+            android:id="@+id/input_size"
+            android:layout_width="376dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
+            android:autofillHints="Size"
+            android:ems="10"
+            android:hint="@string/size"
+            android:inputType="text"
+            tools:ignore="LabelFor,TextFields" />
+
+        <EditText
+            android:id="@+id/input_gender"
+            android:layout_width="376dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
+            android:autofillHints="Gender"
+            android:ems="10"
+            android:hint="@string/gender"
+            android:inputType="text"
+            tools:ignore="LabelFor" />
+
+        <EditText
+            android:id="@+id/input_age"
+            android:layout_width="376dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
+            android:autofillHints="Age"
+            android:ems="10"
+            android:hint="@string/age"
+            android:inputType="text"
+            tools:ignore="LabelFor" />
+
+        <EditText
+            android:id="@+id/input_color"
+            android:layout_width="376dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
+            android:autofillHints="Color"
+            android:ems="10"
+            android:hint="@string/color"
+            android:inputType="text"
+            tools:ignore="LabelFor" />
+
+        <EditText
+            android:id="@+id/input_name"
+            android:layout_width="376dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
+            android:autofillHints="Name"
+            android:ems="10"
+            android:hint="@string/name"
+            android:inputType="text"
+            tools:ignore="LabelFor" />
+
+        <EditText
+            android:id="@+id/input_breed"
+            android:layout_width="376dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
+            android:autofillHints="Breed"
+            android:ems="10"
+            android:hint="@string/breed"
+            android:inputType="text"
+            tools:ignore="LabelFor" />
+
+        <EditText
+            android:id="@+id/input_description"
+            android:layout_width="376dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
+            android:autofillHints="Description"
+            android:ems="10"
+            android:hint="@string/description"
+            android:inputType="text"
+            tools:ignore="LabelFor" />
+
+        <fragment
+            android:id="@+id/input_location"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="187dp"
+            android:layout_margin="16dp" />
+
+        <ImageView
+            android:id="@+id/input_image"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:contentDescription="@string/upload_image" />
+
+        <Button
+            android:id="@+id/upload_image"
+            android:layout_width="381dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="@string/upload_image" />
+
+        <Button
+            android:id="@+id/submit_image"
+            android:layout_width="383dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="@string/submit" />
+
+
+    </LinearLayout>
+</ScrollView>

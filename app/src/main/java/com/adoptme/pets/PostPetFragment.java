@@ -1,65 +1,256 @@
 package com.adoptme.pets;
 
+import static android.app.Activity.RESULT_OK;
+import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
+
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.adoptme.R;
+import com.adoptme.databinding.FragmentPostPetBinding;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseUser;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.RuntimePermissions;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link PostPetFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Pet posting screen.
  */
-public class PostPetFragment extends Fragment {
+@RuntimePermissions
+public class PostPetFragment extends Fragment implements GoogleMap.OnMapLongClickListener {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
+    public final String APP_TAG = PostPetFragment.class.getSimpleName();
+    private FragmentPostPetBinding mBinding;
+    private File mPhotoFile;
+    private GoogleMap mMap;
+    private Marker mCurrentMarker;
 
     public PostPetFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PostPetFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PostPetFragment newInstance(String param1, String param2) {
-        PostPetFragment fragment = new PostPetFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        mBinding = FragmentPostPetBinding.inflate(getLayoutInflater());
+        return mBinding.getRoot();
+    }
+
+    @SuppressLint("MissingPermission")
+    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+    void setUserLocation() {
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+        // Set up initial marker in the user's location,
+        getFusedLocationProviderClient(requireContext()).getLastLocation()
+                .addOnSuccessListener(location -> {
+                    LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    onMapLongClick(userLocation);
+                });
+    }
+
+    private void loadMap(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.setOnMapLongClickListener(this);
+
+        PostPetFragmentPermissionsDispatcher.setUserLocationWithPermissionCheck(this);
+    }
+
+    private void displayMissingAttributesToast() {
+        Toast.makeText(getContext(), "Missing attributes", Toast.LENGTH_SHORT).show();
+    }
+
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
+                .findFragmentById(R.id.input_location);
+
+        mapFragment.getMapAsync(this::loadMap);
+
+        mBinding.submitImage.setOnClickListener(v -> {
+            List<String> missingAttributes = new ArrayList<>();
+
+            String type = mBinding.inputType
+                    .getText()
+                    .toString();
+            if (type.isEmpty()) missingAttributes.add("Type");
+
+            String size = mBinding.inputSize
+                    .getText()
+                    .toString();
+            if (size.isEmpty()) missingAttributes.add("Size");
+
+            String gender = mBinding.inputGender
+                    .getText()
+                    .toString();
+            if (gender.isEmpty()) missingAttributes.add("Gender");
+
+            String age = mBinding.inputAge
+                    .getText()
+                    .toString();
+            if (age.isEmpty()) missingAttributes.add("Age");
+
+            String color = mBinding.inputColor
+                    .getText()
+                    .toString();
+            if (color.isEmpty()) missingAttributes.add("Color");
+
+            String name = mBinding.inputName
+                    .getText()
+                    .toString();
+            if (name.isEmpty()) missingAttributes.add("Name");
+
+            String breed = mBinding.inputBreed
+                    .getText()
+                    .toString();
+            if (breed.isEmpty()) missingAttributes.add("Breed");
+
+            String description = mBinding.inputDescription
+                    .getText()
+                    .toString();
+            if (description.isEmpty()) missingAttributes.add("Description");
+
+            if (!missingAttributes.isEmpty()) {
+                displayMissingAttributesToast();
+                // TODO: Display missing attributes.
+                return;
+            }
+
+            if (mCurrentMarker == null) {
+                Toast.makeText(getContext(), "Location must be specified", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (mPhotoFile == null || mBinding.inputImage.getDrawable() == null) {
+                Toast.makeText(getContext(), "You must upload an image", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            ParseUser user = ParseUser.getCurrentUser();
+
+            Pet pet = new Pet();
+            pet.setType(type);
+            pet.setSize(size);
+            pet.setGender(gender);
+            pet.setAge(age);
+            pet.setColor(color);
+            pet.setName(name);
+            pet.setBreed(breed);
+            pet.setDescription(description);
+
+            LatLng currentLocation = mCurrentMarker.getPosition();
+            pet.setLocation(new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude));
+            pet.setPhoto(new ParseFile(mPhotoFile));
+            pet.setUser(user);
+
+            pet.saveInBackground(e -> {
+                if (e != null) {
+                    Toast.makeText(getContext(), "Could not create pet", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                mBinding.inputType.setText("");
+                mBinding.inputSize.setText("");
+                mBinding.inputGender.setText("");
+                mBinding.inputAge.setText("");
+                mBinding.inputColor.setText("");
+                mBinding.inputName.setText("");
+                mBinding.inputBreed.setText("");
+                mBinding.inputDescription.setText("");
+                mBinding.inputImage.setImageResource(0);
+                Toast.makeText(getContext(), "Pet created successfully", Toast.LENGTH_LONG).show();
+            });
+        });
+
+        mBinding.uploadImage.setOnClickListener(v -> launchCamera());
+    }
+
+    private void launchCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        mPhotoFile = getPhotoFileUri("photo.jpg");
+
+        Uri fileProvider = FileProvider.getUriForFile(requireContext(), "com.codepath.fileprovider", mPhotoFile);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
+
+        if (intent.resolveActivity(requireContext().getPackageManager()) != null)
+            startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+    }
+
+    // Returns the File for a photo stored on disk given the fileName
+    public File getPhotoFileUri(String fileName) {
+        File mediaStorageDir = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), APP_TAG);
+
+        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
+            Log.d(APP_TAG, "failed to create directory");
+        }
+
+        return new File(mediaStorageDir.getPath() + File.separator + fileName);
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Bitmap takenImage = BitmapFactory.decodeFile(mPhotoFile.getAbsolutePath());
+                mBinding.inputImage.setImageBitmap(takenImage);
+            } else
+                Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
         }
     }
 
+    /**
+     * Put a marker in the specified location and remove the existing if there is one.
+     *
+     * @param latLng The new marker's location.
+     */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_post_pet, container, false);
+    public void onMapLongClick(@NonNull LatLng latLng) {
+        MarkerOptions options = new MarkerOptions();
+        options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+        options.title("Pet location");
+        options.position(latLng);
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
+
+        if (mCurrentMarker != null) mCurrentMarker.remove();
+        mCurrentMarker = mMap.addMarker(options);
     }
 }
