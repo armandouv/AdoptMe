@@ -76,6 +76,9 @@ public class PetDetailsFragment extends Fragment {
         });
 
         mBinding.petDescription.setText(mPet.getFormattedDescription());
+
+        mBinding.contactEmail.setText(mPet.getUser().getEmail());
+        mBinding.contactPhone.setText(mPet.getUser().getString("phone"));
     }
 
     public static void launch(FragmentManager fragmentManager, Pet pet) {

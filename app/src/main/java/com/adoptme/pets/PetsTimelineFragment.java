@@ -40,6 +40,7 @@ public class PetsTimelineFragment extends Fragment {
 
     protected void populatePets(boolean isRefreshing) {
         ParseQuery<Pet> query = ParseQuery.getQuery(Pet.class);
+        query.include(Pet.KEY_USER);
         query.setLimit(500);
         query.addDescendingOrder("createdAt");
 

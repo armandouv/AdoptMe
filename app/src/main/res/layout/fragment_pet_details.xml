@@ -13,7 +13,7 @@
             android:id="@+id/pet_photo"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="12dp"
             android:contentDescription="@string/pet_photo"
             android:verticalScrollbarPosition="defaultPosition"
             app:layout_constraintEnd_toEndOf="parent"
@@ -72,7 +72,7 @@
             android:layout_marginTop="32dp"
             android:text="@string/test"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintHorizontal_bias="0.501"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pet_location" />
 
@@ -81,9 +81,9 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="224dp"
             android:layout_height="187dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="32dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintHorizontal_bias="0.245"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pet_type" />
 
@@ -91,7 +91,7 @@
             android:id="@+id/pet_type"
             android:layout_width="wrap_content"
             android:layout_height="19dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="12dp"
             android:text="@string/test"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
@@ -108,7 +108,7 @@
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pet_photo"
-            app:layout_constraintVertical_bias="0.085" />
+            app:layout_constraintVertical_bias="0.076" />
 
         <TextView
             android:id="@+id/pet_size"
@@ -129,6 +129,26 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pet_size" />
+
+        <TextView
+            android:id="@+id/contact_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="52dp"
+            android:text="@string/test"
+            app:layout_constraintStart_toEndOf="@+id/pet_location"
+            app:layout_constraintTop_toBottomOf="@+id/contact_phone" />
+
+        <TextView
+            android:id="@+id/contact_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="176dp"
+            android:text="@string/test"
+            app:layout_constraintStart_toEndOf="@+id/pet_location"
+            app:layout_constraintTop_toBottomOf="@+id/pet_photo" />
 
         <ImageButton
             android:id="@+id/like_button"
