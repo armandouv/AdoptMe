@@ -198,7 +198,7 @@ public class PostPetFragment extends Fragment implements GoogleMap.OnMapLongClic
                 mBinding.inputImage.setImageResource(0);
                 Toast.makeText(getContext(), "Pet created successfully", Toast.LENGTH_LONG).show();
 
-                ((MainActivity) getActivity()).switchToTimeline();
+                ((MainActivity) getActivity()).switchToPetsTimeline();
             });
         });
 

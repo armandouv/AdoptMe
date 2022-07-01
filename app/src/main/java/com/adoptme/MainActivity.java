@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         mBinding.bottomNavigation.setSelectedItemId(R.id.home_icon);
     }
 
-    public void switchToTimeline() {
+    public void switchToPetsTimeline() {
         mBinding.bottomNavigation.setSelectedItemId(R.id.pets_icon);
     }
 
