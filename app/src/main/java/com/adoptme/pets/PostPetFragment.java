@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
+import com.adoptme.MainActivity;
 import com.adoptme.R;
 import com.adoptme.databinding.FragmentPostPetBinding;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -196,6 +197,8 @@ public class PostPetFragment extends Fragment implements GoogleMap.OnMapLongClic
                 mBinding.inputDescription.setText("");
                 mBinding.inputImage.setImageResource(0);
                 Toast.makeText(getContext(), "Pet created successfully", Toast.LENGTH_LONG).show();
+
+                ((MainActivity) getActivity()).switchToTimeline();
             });
         });
 

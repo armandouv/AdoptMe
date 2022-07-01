@@ -19,14 +19,16 @@ import com.adoptme.pets.PostPetFragment;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private ActivityMainBinding mBinding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        mBinding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(mBinding.getRoot());
 
-        binding.bottomNavigation.setOnItemSelectedListener(item -> {
+        mBinding.bottomNavigation.setOnItemSelectedListener(item -> {
             Fragment fragment;
             int itemId = item.getItemId();
             if (itemId == R.id.home_icon) {
@@ -45,7 +47,11 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        binding.bottomNavigation.setSelectedItemId(R.id.home_icon);
+        mBinding.bottomNavigation.setSelectedItemId(R.id.home_icon);
+    }
+
+    public void switchToTimeline() {
+        mBinding.bottomNavigation.setSelectedItemId(R.id.pets_icon);
     }
 
     /**
