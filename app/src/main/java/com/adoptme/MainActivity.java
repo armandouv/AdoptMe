@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        mBinding.bottomNavigation.setSelectedItemId(R.id.home_icon);
+        switchToPetsTimeline();
     }
 
     public void switchToPetsTimeline() {
