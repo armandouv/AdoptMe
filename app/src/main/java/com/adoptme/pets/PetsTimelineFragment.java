@@ -34,11 +34,23 @@ public class PetsTimelineFragment extends Fragment {
     protected FragmentPetsTimelineBinding mBinding;
     protected PetsAdapter mPetsAdapter;
 
+    // If set to false, the preferences menu will be hidden and ranking will not be performed.
+    private boolean mIsRankingActive = true;
+
     public PetsTimelineFragment() {
         // Required empty public constructor
     }
 
-    protected void populatePets(boolean isRefreshing) {
+    public void setRankingActive(boolean isRankingActive) {
+        mIsRankingActive = isRankingActive;
+    }
+
+    /**
+     * Populates the 500 most recent pets and sorts them according to the specified user preferences.
+     *
+     * @param isRefreshing Whether the query is done to serve a refresh or it's the initial one.
+     */
+    protected void populatePetsAndSort(boolean isRefreshing) {
         ParseQuery<Pet> query = ParseQuery.getQuery(Pet.class);
         query.include(Pet.KEY_USER);
         query.setLimit(500);
@@ -78,15 +90,18 @@ public class PetsTimelineFragment extends Fragment {
                     LoginActivity.launchAndClear(getActivity());
                 }));
 
-        mBinding.preferencesButton.setOnClickListener(v ->
-                PreferencesMenuFragment.launch(getFragmentManager()));
+        // Set up or hide preferences menu
+        if (mIsRankingActive)
+            mBinding.preferencesButton.setOnClickListener(v ->
+                    PreferencesMenuFragment.launch(getFragmentManager()));
+        else mBinding.preferencesButton.setVisibility(View.GONE);
 
         mPetsAdapter = new PetsAdapter(getContext(), mPets, (v, position) -> {
             Pet pet = mPets.get(position);
             PetDetailsFragment.launch(getFragmentManager(), pet);
         });
 
-        mBinding.swipeContainer.setOnRefreshListener(() -> populatePets(true));
+        mBinding.swipeContainer.setOnRefreshListener(() -> populatePetsAndSort(true));
 
         mBinding.swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -98,13 +113,13 @@ public class PetsTimelineFragment extends Fragment {
 
         // Only populate timeline once (refreshing will update it if needed)
         if (mPets.isEmpty()) {
-            // Note: sorting is done inside populatePets after data arrives.
-            populatePets(false);
+            // Note: sorting is done inside populatePetsAndSort after data arrives.
+            populatePetsAndSort(false);
             return;
         }
 
-        // Sort existing data
-        sortPetsByPreferences();
+        // Sort existing data (only needed if ranking is performed, since user preferences may change)
+        if (mIsRankingActive) sortPetsByPreferences();
     }
 
     private void sortPetsByPreferences() {

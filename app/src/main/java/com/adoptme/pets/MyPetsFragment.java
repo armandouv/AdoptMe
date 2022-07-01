@@ -1,65 +1,41 @@
 package com.adoptme.pets;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.util.Log;
 
-import androidx.fragment.app.Fragment;
-
-import com.adoptme.R;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link MyPetsFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Displays Pets posted by the logged in user. Pets will be sorted from the most to the least recent.
+ * The preferences menu will be hidden and ranking will not be performed.
  */
-public class MyPetsFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+public class MyPetsFragment extends PetsTimelineFragment {
 
     public MyPetsFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MyPetsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MyPetsFragment newInstance(String param1, String param2) {
-        MyPetsFragment fragment = new MyPetsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+        setRankingActive(false);
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    protected void populatePetsAndSort(boolean isRefreshing) {
+        ParseQuery<Pet> query = ParseQuery.getQuery(Pet.class);
+        query.include(Pet.KEY_USER);
+        query.whereEqualTo(Pet.KEY_USER, ParseUser.getCurrentUser());
+        query.setLimit(500);
+        query.addDescendingOrder("createdAt");
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_my_pets, container, false);
+        query.findInBackground((pets, e) -> {
+            if (e != null) {
+                Log.e(TAG, "Could not query pets", e);
+                return;
+            }
+
+            if (isRefreshing) {
+                mPets.clear();
+                mBinding.swipeContainer.setRefreshing(false);
+            }
+
+            mPets.addAll(pets);
+            mPetsAdapter.notifyDataSetChanged();
+        });
     }
 }
