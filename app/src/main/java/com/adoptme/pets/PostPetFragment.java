@@ -22,7 +22,6 @@ import androidx.core.content.FileProvider;
 import com.adoptme.MainActivity;
 import com.adoptme.databinding.FragmentPostPetBinding;
 import com.adoptme.maps.PetsMapContainerFragment;
-import com.adoptme.maps.PetsMapOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
@@ -44,7 +43,6 @@ public class PostPetFragment extends PetsMapContainerFragment {
 
     public PostPetFragment() {
         // Required empty public constructor
-        super(new PetsMapOptions());
     }
 
     @Override
