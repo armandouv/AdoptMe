@@ -1,10 +1,7 @@
 package com.adoptme.pets;
 
 import static android.app.Activity.RESULT_OK;
-import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,18 +18,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
-import androidx.fragment.app.Fragment;
 
 import com.adoptme.MainActivity;
-import com.adoptme.R;
 import com.adoptme.databinding.FragmentPostPetBinding;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.adoptme.maps.PetsMapContainerFragment;
+import com.adoptme.maps.PetsMapOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
@@ -41,24 +32,19 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import permissions.dispatcher.NeedsPermission;
-import permissions.dispatcher.RuntimePermissions;
-
 /**
  * Pet posting screen.
  */
-@RuntimePermissions
-public class PostPetFragment extends Fragment implements GoogleMap.OnMapLongClickListener {
+public class PostPetFragment extends PetsMapContainerFragment {
 
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     public final String APP_TAG = PostPetFragment.class.getSimpleName();
     private FragmentPostPetBinding mBinding;
     private File mPhotoFile;
-    private GoogleMap mMap;
-    private Marker mCurrentMarker;
 
     public PostPetFragment() {
         // Required empty public constructor
+        super(new PetsMapOptions());
     }
 
     @Override
@@ -69,41 +55,13 @@ public class PostPetFragment extends Fragment implements GoogleMap.OnMapLongClic
         return mBinding.getRoot();
     }
 
-    @SuppressLint("MissingPermission")
-    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-    void setUserLocation() {
-        mMap.setMyLocationEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(true);
-
-        // Set up initial marker in the user's location,
-        getFusedLocationProviderClient(requireContext()).getLastLocation()
-                .addOnSuccessListener(location -> {
-                    LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                    onMapLongClick(userLocation);
-                });
-    }
-
-    private void loadMap(GoogleMap googleMap) {
-        mMap = googleMap;
-        mMap.setOnMapLongClickListener(this);
-
-        PostPetFragmentPermissionsDispatcher.setUserLocationWithPermissionCheck(this);
-    }
-
     private void displayMissingAttributesToast() {
         Toast.makeText(getContext(), "Missing attributes", Toast.LENGTH_SHORT).show();
     }
 
-    @SuppressLint("MissingPermission")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.input_location);
-
-        mapFragment.getMapAsync(this::loadMap);
 
         mBinding.submitImage.setOnClickListener(v -> {
             List<String> missingAttributes = new ArrayList<>();
@@ -154,7 +112,7 @@ public class PostPetFragment extends Fragment implements GoogleMap.OnMapLongClic
                 return;
             }
 
-            if (mCurrentMarker == null) {
+            if (getMarker() == null) {
                 Toast.makeText(getContext(), "Location must be specified", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -176,7 +134,7 @@ public class PostPetFragment extends Fragment implements GoogleMap.OnMapLongClic
             pet.setBreed(breed);
             pet.setDescription(description);
 
-            LatLng currentLocation = mCurrentMarker.getPosition();
+            LatLng currentLocation = getMarker().getPosition();
             pet.setLocation(new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude));
             pet.setPhoto(new ParseFile(mPhotoFile));
             pet.setUser(user);
@@ -237,23 +195,5 @@ public class PostPetFragment extends Fragment implements GoogleMap.OnMapLongClic
             } else
                 Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    /**
-     * Put a marker in the specified location and remove the existing if there is one.
-     *
-     * @param latLng The new marker's location.
-     */
-    @Override
-    public void onMapLongClick(@NonNull LatLng latLng) {
-        MarkerOptions options = new MarkerOptions();
-        options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-        options.title("Pet location");
-        options.position(latLng);
-
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
-
-        if (mCurrentMarker != null) mCurrentMarker.remove();
-        mCurrentMarker = mMap.addMarker(options);
     }
 }
