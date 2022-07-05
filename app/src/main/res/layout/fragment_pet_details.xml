@@ -74,10 +74,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.501"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pet_location" />
+            app:layout_constraintTop_toBottomOf="@+id/map" />
 
         <fragment
-            android:id="@+id/pet_location"
+            android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="224dp"
             android:layout_height="187dp"
@@ -137,7 +137,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="52dp"
             android:text="@string/test"
-            app:layout_constraintStart_toEndOf="@+id/pet_location"
+            app:layout_constraintStart_toEndOf="@+id/map"
             app:layout_constraintTop_toBottomOf="@+id/contact_phone" />
 
         <TextView
@@ -147,7 +147,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="176dp"
             android:text="@string/test"
-            app:layout_constraintStart_toEndOf="@+id/pet_location"
+            app:layout_constraintStart_toEndOf="@+id/map"
             app:layout_constraintTop_toBottomOf="@+id/pet_photo" />
 
         <ImageButton

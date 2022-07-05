@@ -11,17 +11,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.adoptme.R;
 import com.adoptme.databinding.FragmentPetDetailsBinding;
+import com.adoptme.maps.PetsMapContainerFragment;
+import com.adoptme.maps.PetsMapOptions;
 import com.bumptech.glide.Glide;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
@@ -29,22 +27,32 @@ import com.parse.ParseUser;
 /**
  * Displays a detailed view of a Pet.
  */
-public class PetDetailsFragment extends Fragment {
+public class PetDetailsFragment extends PetsMapContainerFragment {
 
-    private FragmentPetDetailsBinding mBinding;
     private Pet mPet;
     private final GestureDetector mGestureDetector = new GestureDetector(getContext(), new DoubleTapListener());
+    private FragmentPetDetailsBinding mBinding;
 
     public PetDetailsFragment() {
-        // Required empty public constructor
+    }
+
+    public static void launch(FragmentManager fragmentManager, Pet pet) {
+        PetDetailsFragment fragment = new PetDetailsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(Pet.class.getSimpleName(), pet);
+        fragment.setArguments(bundle);
+
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        mPet = this.getArguments().getParcelable(Pet.class.getSimpleName());
 
         setUpLikesFunctionality();
 
@@ -62,35 +70,10 @@ public class PetDetailsFragment extends Fragment {
         mBinding.petColor.setText(mPet.getFormattedColor());
         mBinding.petBreed.setText(mPet.getFormattedBreed());
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.pet_location);
-        mapFragment.getMapAsync(googleMap -> {
-            ParseGeoPoint location = mPet.getLocation();
-            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-            googleMap.addMarker(new MarkerOptions()
-                    .position(latLng)
-                    .title("Pet location"));
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
-        });
-
         mBinding.petDescription.setText(mPet.getFormattedDescription());
 
         mBinding.contactEmail.setText(mPet.getUser().getEmail());
         mBinding.contactPhone.setText(mPet.getUser().getString("phone"));
-    }
-
-    public static void launch(FragmentManager fragmentManager, Pet pet) {
-        PetDetailsFragment fragment = new PetDetailsFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(Pet.class.getSimpleName(), pet);
-        fragment.setArguments(bundle);
-
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.container, fragment);
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        transaction.addToBackStack(null);
-        transaction.commit();
     }
 
     private void toggleLike() {
@@ -123,6 +106,14 @@ public class PetDetailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mBinding = FragmentPetDetailsBinding.inflate(getLayoutInflater());
+
+        mPet = this.getArguments().getParcelable(Pet.class.getSimpleName());
+        // Set up map
+        ParseGeoPoint location = mPet.getLocation();
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        PetsMapOptions options = new PetsMapOptions(false, latLng);
+        setOptions(options);
+
         return mBinding.getRoot();
     }
 
