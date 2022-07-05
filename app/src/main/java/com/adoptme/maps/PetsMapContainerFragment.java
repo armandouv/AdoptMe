@@ -32,11 +32,11 @@ import permissions.dispatcher.RuntimePermissions;
  */
 @RuntimePermissions
 public abstract class PetsMapContainerFragment extends Fragment {
-    private final PetsMapOptions mOptions;
+    private PetsMapOptions mOptions = new PetsMapOptions();
     private GoogleMap mMap;
     private Marker mCurrentMarker;
 
-    public PetsMapContainerFragment(PetsMapOptions options) {
+    public void setOptions(PetsMapOptions options) {
         mOptions = options;
     }
 
