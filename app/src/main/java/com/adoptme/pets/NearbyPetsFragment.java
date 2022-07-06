@@ -17,6 +17,7 @@ import com.adoptme.maps.PetsMapContainerFragment;
  * changed.
  */
 public class NearbyPetsFragment extends PetsMapContainerFragment {
+    private final int mPageNumberToLoad = 1;
 
     public NearbyPetsFragment() {
         // Required empty public constructor
