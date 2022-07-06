@@ -134,6 +134,9 @@ public abstract class PetsMapContainerFragment extends Fragment {
         });
     }
 
+    public void onMarkerUpdated() {
+    }
+
     /**
      * Replaces the current marker with one located at latLng.
      *
@@ -143,15 +146,17 @@ public abstract class PetsMapContainerFragment extends Fragment {
         MarkerOptions options = new MarkerOptions();
         options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
         options.position(latLng);
+        options.zIndex(1);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
 
         if (mCurrentMarker != null) mCurrentMarker.remove();
         setMarker(mMap.addMarker(options));
+        onMarkerUpdated();
     }
 
-    public Circle setZoom(double radiusInMiles) {
+    public Circle setZoom(double radiusInMeters) {
         CircleOptions options = new CircleOptions().center(getLocation())
-                .radius(milesToMeters(radiusInMiles)).strokeColor(Color.RED);
+                .radius(radiusInMeters).strokeColor(Color.RED);
         Circle circle = mMap.addCircle(options);
         circle.setVisible(true);
 
@@ -163,10 +168,6 @@ public abstract class PetsMapContainerFragment extends Fragment {
         double radius = circle.getRadius();
         double scale = radius / 500;
         return (int) (16 - Math.log(scale) / Math.log(2));
-    }
-
-    private double milesToMeters(double radiusInMiles) {
-        return radiusInMiles * 1609.344;
     }
 
     public Marker addPetMarker(Pet pet) {

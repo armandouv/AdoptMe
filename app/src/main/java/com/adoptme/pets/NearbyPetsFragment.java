@@ -42,6 +42,10 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
+    @Override
+    public void onMarkerUpdated() {
+        queryPets(5000);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,7 +54,7 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
         return inflater.inflate(R.layout.fragment_nearby_pets, container, false);
     }
 
-    private void queryPets(double radiusInMiles) {
+    private void queryPets(double radiusInMeters) {
         ParseQuery<Pet> query = ParseQuery.getQuery(Pet.class);
         query.include(Pet.KEY_USER);
         query.addDescendingOrder("createdAt");
@@ -60,8 +64,8 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
         query.setLimit(PAGE_SIZE);
 
         LatLng latLng = getLocation();
-        query.whereWithinMiles(Pet.KEY_LOCATION,
-                new ParseGeoPoint(latLng.latitude, latLng.longitude), radiusInMiles);
+        query.whereWithinKilometers(Pet.KEY_LOCATION,
+                new ParseGeoPoint(latLng.latitude, latLng.longitude), radiusInMeters / 1000);
 
         query.findInBackground((pets, e) -> {
             if (e != null) {
@@ -69,14 +73,14 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
                 return;
             }
 
-            if (mPageNumberToLoad != 0) mPets.clear();
+            if (mPageNumberToLoad == 0) mPets.clear();
             mPets.addAll(pets);
+
+            refreshPets(radiusInMeters);
         });
     }
 
-    private void refreshPets() {
-        queryPets(5);
-
+    private void refreshPets(double radiusInMeters) {
         if (mCurrentRadius != null) mCurrentRadius.remove();
 
         mPetMarkers.forEach(Marker::remove);
@@ -89,6 +93,6 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
                 .forEach(mPetMarkers::add);
 
         // Set up map zoom according to radius. Keep track of drawn circle for future deletion.
-        mCurrentRadius = setZoom(5);
+        mCurrentRadius = setZoom(radiusInMeters);
     }
 }
