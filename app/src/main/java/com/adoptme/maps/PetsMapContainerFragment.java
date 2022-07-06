@@ -144,4 +144,8 @@ public abstract class PetsMapContainerFragment extends Fragment {
         if (mCurrentMarker != null) mCurrentMarker.remove();
         setMarker(mMap.addMarker(options));
     }
+
+    public LatLng getLocation() {
+        return mCurrentMarker.getPosition();
+    }
 }
