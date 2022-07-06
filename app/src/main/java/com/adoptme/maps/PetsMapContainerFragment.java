@@ -4,6 +4,7 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 
@@ -12,10 +13,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.adoptme.R;
+import com.adoptme.pets.Pet;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -143,6 +147,33 @@ public abstract class PetsMapContainerFragment extends Fragment {
 
         if (mCurrentMarker != null) mCurrentMarker.remove();
         setMarker(mMap.addMarker(options));
+    }
+
+    public Circle setZoom(double radiusInMiles) {
+        CircleOptions options = new CircleOptions().center(getLocation())
+                .radius(milesToMeters(radiusInMiles)).strokeColor(Color.RED);
+        Circle circle = mMap.addCircle(options);
+        circle.setVisible(true);
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLocation(), getZoomLevel(circle)));
+        return circle;
+    }
+
+    private int getZoomLevel(Circle circle) {
+        double radius = circle.getRadius();
+        double scale = radius / 500;
+        return (int) (16 - Math.log(scale) / Math.log(2));
+    }
+
+    private double milesToMeters(double radiusInMiles) {
+        return radiusInMiles * 1609.344;
+    }
+
+    public Marker addPetMarker(Pet pet) {
+        MarkerOptions options = new MarkerOptions();
+        options.position(pet.getLocationAsLatLng());
+
+        return mMap.addMarker(options);
     }
 
     public LatLng getLocation() {

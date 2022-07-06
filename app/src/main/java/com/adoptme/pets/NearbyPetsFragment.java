@@ -11,7 +11,9 @@ import androidx.annotation.Nullable;
 
 import com.adoptme.R;
 import com.adoptme.maps.PetsMapContainerFragment;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 
@@ -24,10 +26,12 @@ import java.util.List;
  * changed.
  */
 public class NearbyPetsFragment extends PetsMapContainerFragment {
-    private final int mPageNumberToLoad = 1;
     private final static int PAGE_SIZE = 30;
     private final static String TAG = NearbyPetsFragment.class.getSimpleName();
+    private final int mPageNumberToLoad = 0;
     private final List<Pet> mPets = new ArrayList<>();
+    private final List<Marker> mPetMarkers = new ArrayList<>();
+    private Circle mCurrentRadius;
 
     public NearbyPetsFragment() {
         // Required empty public constructor
@@ -46,18 +50,18 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
         return inflater.inflate(R.layout.fragment_nearby_pets, container, false);
     }
 
-    private void queryPets(int radius) {
+    private void queryPets(double radiusInMiles) {
         ParseQuery<Pet> query = ParseQuery.getQuery(Pet.class);
         query.include(Pet.KEY_USER);
         query.addDescendingOrder("createdAt");
 
         // Pagination
-        query.setSkip(PAGE_SIZE * (mPageNumberToLoad - 1));
+        query.setSkip(PAGE_SIZE * mPageNumberToLoad);
         query.setLimit(PAGE_SIZE);
 
         LatLng latLng = getLocation();
         query.whereWithinMiles(Pet.KEY_LOCATION,
-                new ParseGeoPoint(latLng.latitude, latLng.longitude), radius);
+                new ParseGeoPoint(latLng.latitude, latLng.longitude), radiusInMiles);
 
         query.findInBackground((pets, e) -> {
             if (e != null) {
@@ -65,7 +69,26 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
                 return;
             }
 
+            if (mPageNumberToLoad != 0) mPets.clear();
             mPets.addAll(pets);
         });
+    }
+
+    private void refreshPets() {
+        queryPets(5);
+
+        if (mCurrentRadius != null) mCurrentRadius.remove();
+
+        mPetMarkers.forEach(Marker::remove);
+        mPetMarkers.clear();
+
+        // Create a pet marker for each pet and add them to the map. Keep track of markers for future
+        // deletion in mPetMarkers.
+        mPets.stream()
+                .map(this::addPetMarker)
+                .forEach(mPetMarkers::add);
+
+        // Set up map zoom according to radius. Keep track of drawn circle for future deletion.
+        mCurrentRadius = setZoom(5);
     }
 }

@@ -1,5 +1,6 @@
 package com.adoptme.pets;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
@@ -160,6 +161,11 @@ public class Pet extends ParseObject {
         }
 
         return attributes;
+    }
+
+    public LatLng getLocationAsLatLng() {
+        ParseGeoPoint location = getLocation();
+        return new LatLng(location.getLatitude(), location.getLongitude());
     }
 
     private String getFormatted(String value) {
