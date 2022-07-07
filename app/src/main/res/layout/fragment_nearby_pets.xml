@@ -19,6 +19,16 @@
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="58dp" />
+
+    <Button
+        android:id="@+id/load_more_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/load_more" />
 </RelativeLayout>
 
 

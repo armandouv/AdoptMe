@@ -14,6 +14,7 @@ import com.adoptme.maps.PetsMapContainerFragment;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.material.slider.Slider;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 
@@ -26,17 +27,18 @@ import java.util.List;
  * changed.
  */
 public class NearbyPetsFragment extends PetsMapContainerFragment {
-    private final static int PAGE_SIZE = 30;
+    private final static int PAGE_SIZE = 2;
     private final static String TAG = NearbyPetsFragment.class.getSimpleName();
     private final static int DEFAULT_RADIUS_IN_METERS = 5000;
     private final static int MINIMUM_RADIUS_IN_METERS = 1000;
     private final static int MAXIMUM_RADIUS_IN_METERS = 100000;
 
-    private final int mPageNumberToLoad = 0;
+    private int mPageNumberToLoad = 0;
     private final List<Pet> mPets = new ArrayList<>();
     private final List<Marker> mPetMarkers = new ArrayList<>();
-    private Circle mCurrentRadius;
+    private Circle mCurrentCircle;
     private FragmentNearbyPetsBinding mBinding;
+    private double mCurrentRadiusInMeters = DEFAULT_RADIUS_IN_METERS;
 
     public NearbyPetsFragment() {
         // Required empty public constructor
@@ -49,14 +51,37 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
         mBinding.radiusSlider.setValueFrom(MINIMUM_RADIUS_IN_METERS);
         mBinding.radiusSlider.setValueTo(MAXIMUM_RADIUS_IN_METERS);
         mBinding.radiusSlider.setValue(DEFAULT_RADIUS_IN_METERS);
-        mBinding.radiusSlider.addOnChangeListener((slider, value, fromUser) -> queryPets(value));
+
+        mBinding.radiusSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
+            @Override
+            public void onStartTrackingTouch(@NonNull Slider slider) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(@NonNull Slider slider) {
+                resetMap(slider.getValue());
+            }
+        });
+
+        mBinding.radiusSlider.addOnChangeListener((slider, value, fromUser) -> {
+            mCurrentRadiusInMeters = value;
+            refreshCircle();
+        });
+        mBinding.loadMoreButton.setOnClickListener(v -> queryAndRefreshPets());
     }
+
+    private void resetMap(double radiusInMeters) {
+        mCurrentRadiusInMeters = radiusInMeters;
+        mPageNumberToLoad = 0;
+        mBinding.loadMoreButton.setVisibility(View.VISIBLE);
+        mBinding.radiusSlider.setValue((float) mCurrentRadiusInMeters);
+        queryAndRefreshPets();
+    }
+
 
     @Override
     public void onMarkerUpdated() {
-        queryPets(DEFAULT_RADIUS_IN_METERS);
-
-        mBinding.radiusSlider.setValue(DEFAULT_RADIUS_IN_METERS);
+        resetMap(DEFAULT_RADIUS_IN_METERS);
     }
 
     @Override
@@ -67,18 +92,19 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
         return mBinding.getRoot();
     }
 
-    private void queryPets(double radiusInMeters) {
+    private void queryAndRefreshPets() {
         ParseQuery<Pet> query = ParseQuery.getQuery(Pet.class);
         query.include(Pet.KEY_USER);
         query.addDescendingOrder("createdAt");
 
         // Pagination
         query.setSkip(PAGE_SIZE * mPageNumberToLoad);
-        query.setLimit(PAGE_SIZE);
+        // Query one more element to know if it's the last page.
+        query.setLimit(PAGE_SIZE + 1);
 
         LatLng latLng = getLocation();
         query.whereWithinKilometers(Pet.KEY_LOCATION,
-                new ParseGeoPoint(latLng.latitude, latLng.longitude), radiusInMeters / 1000);
+                new ParseGeoPoint(latLng.latitude, latLng.longitude), mCurrentRadiusInMeters / 1000);
 
         query.findInBackground((pets, e) -> {
             if (e != null) {
@@ -89,13 +115,24 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
             if (mPageNumberToLoad == 0) mPets.clear();
             mPets.addAll(pets);
 
-            refreshPets(radiusInMeters);
+            mPageNumberToLoad++;
+
+            // This means that the queried page is the last one.
+            if (pets.size() != PAGE_SIZE + 1) mBinding.loadMoreButton.setVisibility(View.GONE);
+                // Don't display the last pet, since it'll be displayed in the subsequent page.
+            else mPets.remove(mPets.size() - 1);
+
+            refreshPets();
         });
     }
 
-    private void refreshPets(double radiusInMeters) {
-        if (mCurrentRadius != null) mCurrentRadius.remove();
+    private void refreshCircle() {
+        if (mCurrentCircle != null) mCurrentCircle.remove();
+        // Set up map zoom according to radius. Keep track of drawn circle for future deletion.
+        mCurrentCircle = setZoom(mCurrentRadiusInMeters);
+    }
 
+    private void refreshPets() {
         mPetMarkers.forEach(Marker::remove);
         mPetMarkers.clear();
 
@@ -105,7 +142,6 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
                 .map(this::addPetMarker)
                 .forEach(mPetMarkers::add);
 
-        // Set up map zoom according to radius. Keep track of drawn circle for future deletion.
-        mCurrentRadius = setZoom(radiusInMeters);
+        refreshCircle();
     }
 }
