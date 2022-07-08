@@ -24,6 +24,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Date;
+
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
@@ -39,6 +41,8 @@ public abstract class PetsMapContainerFragment extends Fragment {
     private PetsMapOptions mOptions = new PetsMapOptions();
     private GoogleMap mMap;
     private Marker mCurrentMarker;
+    private static final long DAY_IN_MILLISECONDS = 1000L * 60L * 60L * 24L;
+    private static final long ADOPTION_INTERVAL_IN_MILLISECONDS = DAY_IN_MILLISECONDS * 10L;
 
     public void setOptions(PetsMapOptions options) {
         mOptions = options;
@@ -133,7 +137,7 @@ public abstract class PetsMapContainerFragment extends Fragment {
      */
     private void updateMarker(LatLng latLng) {
         MarkerOptions options = new MarkerOptions();
-        options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+        options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
         options.position(latLng);
         options.zIndex(1);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
@@ -162,8 +166,23 @@ public abstract class PetsMapContainerFragment extends Fragment {
     public Marker addPetMarker(Pet pet) {
         MarkerOptions options = new MarkerOptions();
         options.position(pet.getLocationAsLatLng());
+        options.icon(BitmapDescriptorFactory.defaultMarker(getUrgencyColor(pet)));
 
         return mMap.addMarker(options);
+    }
+
+    private float getUrgencyColor(Pet pet) {
+        Date createdAt = pet.getCreatedAt();
+        long timeElapsedInMilliseconds = Math.abs(System.currentTimeMillis() - createdAt.getTime());
+
+        if (timeElapsedInMilliseconds > ADOPTION_INTERVAL_IN_MILLISECONDS)
+            return BitmapDescriptorFactory.HUE_RED;
+
+        double colorInterval = Math.abs(BitmapDescriptorFactory.HUE_GREEN - BitmapDescriptorFactory.HUE_RED);
+        double urgencyFactor = (double) timeElapsedInMilliseconds / ADOPTION_INTERVAL_IN_MILLISECONDS;
+
+        // Assuming HUE_GREEN is larger than HUE_RED
+        return BitmapDescriptorFactory.HUE_GREEN - (float) (urgencyFactor * colorInterval);
     }
 
     public LatLng getLocation() {
