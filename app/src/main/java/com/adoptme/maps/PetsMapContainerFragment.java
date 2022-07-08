@@ -98,6 +98,9 @@ public abstract class PetsMapContainerFragment extends Fragment {
                 });
     }
 
+    public void onMapReady(GoogleMap map) {
+    }
+
     /**
      * Sets up the map in the specified container. A handler to change the marker on a long click
      * will be set if canChangeMarker is true. The initial marker will be set at initialLocation.
@@ -113,6 +116,7 @@ public abstract class PetsMapContainerFragment extends Fragment {
                 map.setOnMapLongClickListener(this::updateMarker);
 
             updateMarker(initialLocation);
+            onMapReady(map);
         });
     }
 
@@ -131,6 +135,7 @@ public abstract class PetsMapContainerFragment extends Fragment {
                 map.setOnMapLongClickListener(this::updateMarker);
 
             setUserLocation();
+            onMapReady(map);
         });
     }
 

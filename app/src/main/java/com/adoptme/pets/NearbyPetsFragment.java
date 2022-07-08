@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 
 import com.adoptme.databinding.FragmentNearbyPetsBinding;
 import com.adoptme.maps.PetsMapContainerFragment;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -19,7 +20,9 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -35,13 +38,25 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
 
     private int mPageNumberToLoad = 0;
     private final List<Pet> mPets = new ArrayList<>();
-    private final List<Marker> mPetMarkers = new ArrayList<>();
+    private final Map<Marker, Pet> mMarkerToPet = new HashMap<>();
     private Circle mCurrentCircle;
     private FragmentNearbyPetsBinding mBinding;
     private double mCurrentRadiusInMeters = DEFAULT_RADIUS_IN_METERS;
 
     public NearbyPetsFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        map.setOnMarkerClickListener(marker -> {
+            // If it's the user's marker, don't launch the pet fragment.
+            // TODO: Launch user profile (stretch feature)
+            if (marker.equals(getMarker())) return false;
+
+            PetDetailsFragment.launch(getFragmentManager(), mMarkerToPet.get(marker));
+            return true;
+        });
     }
 
     @Override
@@ -133,14 +148,16 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
     }
 
     private void refreshPets() {
-        mPetMarkers.forEach(Marker::remove);
-        mPetMarkers.clear();
+        for (Marker marker : mMarkerToPet.keySet()) marker.remove();
+        mMarkerToPet.clear();
 
         // Create a pet marker for each pet and add them to the map. Keep track of markers for future
-        // deletion in mPetMarkers.
-        mPets.stream()
-                .map(this::addPetMarker)
-                .forEach(mPetMarkers::add);
+        // deletion in mMarkerToPet, as well as their corresponding pets for usage in onMapReady's
+        // click handler.
+        for (Pet pet : mPets) {
+            Marker marker = addPetMarker(pet);
+            mMarkerToPet.put(marker, pet);
+        }
 
         refreshCircle();
     }
