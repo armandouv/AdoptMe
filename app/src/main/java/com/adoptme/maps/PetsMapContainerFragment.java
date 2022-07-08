@@ -71,8 +71,7 @@ public abstract class PetsMapContainerFragment extends Fragment {
         boolean canChangeMarker = options.canChangeMarker();
         LatLng initialLocation = options.getInitialLocation();
 
-        if (initialLocation == null) setUpMap(canChangeMarker);
-        else setUpMap(canChangeMarker, initialLocation);
+        setUpMap(canChangeMarker, initialLocation);
     }
 
     @Override
@@ -103,7 +102,9 @@ public abstract class PetsMapContainerFragment extends Fragment {
 
     /**
      * Sets up the map in the specified container. A handler to change the marker on a long click
-     * will be set if canChangeMarker is true. The initial marker will be set at initialLocation.
+     * will be set if canChangeMarker is true. The initial marker will be set at initialLocation if
+     * it is not null. Otherwise, the initial marker will be set to the user's current
+     * location. Location permissions must have been given before this method is executed.
      *
      * @param canChangeMarker Whether this map will support marker changing on a long click.
      * @param initialLocation Location of the initial marker.
@@ -115,26 +116,9 @@ public abstract class PetsMapContainerFragment extends Fragment {
             if (canChangeMarker)
                 map.setOnMapLongClickListener(this::updateMarker);
 
-            updateMarker(initialLocation);
-            onMapReady(map);
-        });
-    }
+            if (initialLocation != null) updateMarker(initialLocation);
+            else setUserLocation();
 
-    /**
-     * Sets up the map in the specified container. A handler to change the marker on a long click
-     * will be set if canChangeMarker is true. The initial marker will be set to the user's current
-     * location. Location permissions must have been given before this method is executed.
-     *
-     * @param canChangeMarker Whether this map will support marker changing on a long click.
-     */
-    public void setUpMap(boolean canChangeMarker) {
-        getMapFragment().getMapAsync(map -> {
-            setMap(map);
-
-            if (canChangeMarker)
-                map.setOnMapLongClickListener(this::updateMarker);
-
-            setUserLocation();
             onMapReady(map);
         });
     }
