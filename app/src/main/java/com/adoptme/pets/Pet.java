@@ -1,5 +1,14 @@
 package com.adoptme.pets;
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
+import android.util.Log;
+
+import androidx.annotation.Nullable;
+
+import com.codepath.asynchttpclient.AsyncHttpClient;
+import com.codepath.asynchttpclient.callback.BinaryHttpResponseHandler;
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
@@ -7,10 +16,18 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.Headers;
+import okhttp3.Response;
 
 /**
  * Represents a Pet for adoption.
@@ -29,8 +46,120 @@ public class Pet extends ParseObject {
     public static final String KEY_PHOTO = "photo";
     public static final String KEY_USER = "user";
 
+    private static final String TAG = Pet.class.getSimpleName();
+
     private boolean mUserLiked;
     private int mLikesCount;
+
+    public Pet() {
+    }
+
+    public Pet(JSONObject jsonObject, Context context) throws JSONException {
+        String UNKNOWN = "unknown";
+
+        String type = jsonObject.has("type") ?
+                jsonObject.getString("type") : UNKNOWN;
+
+        String size = jsonObject.has("size") ?
+                jsonObject.getString("size") : UNKNOWN;
+
+        String gender = jsonObject.has("gender") ?
+                jsonObject.getString("gender") : UNKNOWN;
+
+        String age = jsonObject.has("age") ?
+                jsonObject.getString("age") : UNKNOWN;
+
+        JSONObject colorsObject = jsonObject.getJSONObject("colors");
+        String color = colorsObject.has("primary") ?
+                colorsObject.getString("primary") : UNKNOWN;
+
+        String name = jsonObject.has("name") ?
+                jsonObject.getString("name") : UNKNOWN;
+
+        JSONObject breedsObject = jsonObject.getJSONObject("colors");
+        String breed = breedsObject.has("primary") ?
+                colorsObject.getString("primary") : UNKNOWN;
+
+        ParseGeoPoint location = addressToGeoPoint(jsonObject.getJSONObject("address"), context);
+        String description = jsonObject.has("description") ?
+                jsonObject.getString("description") : UNKNOWN;
+
+        savePetPhoto(jsonObject);
+
+        setType(type);
+        setSize(size);
+        setGender(gender);
+        setAge(age);
+        setColor(color);
+        setName(name);
+        setBreed(breed);
+        setLocation(location);
+        setDescription(description);
+    }
+
+    public static List<Pet> fromJSONArray(JSONArray results, Context context) throws JSONException {
+        List<Pet> pets = new ArrayList<>();
+
+        int length = results.length();
+        for (int i = 0; i < length; i++) {
+            pets.add(new Pet(results.getJSONObject(i), context));
+        }
+
+        return pets;
+    }
+
+    private ParseGeoPoint addressToGeoPoint(JSONObject addressObject, Context context) throws JSONException {
+        String strAddress = "";
+
+        if (addressObject.has("address1"))
+            strAddress += addressObject.getString("address1") + ", ";
+
+        strAddress += addressObject.getString("city") + ", "
+                + addressObject.getString("state") + ", "
+                + addressObject.getString("postcode") + ", "
+                + addressObject.getString("country");
+
+        Geocoder coder = new Geocoder(context);
+        List<Address> address;
+        ParseGeoPoint geoPoint = new ParseGeoPoint();
+
+        try {
+            address = coder.getFromLocationName(strAddress, 5);
+            if (address == null) return null;
+
+            Address location = address.get(0);
+            geoPoint.setLatitude(location.getLatitude());
+            geoPoint.setLongitude(location.getLongitude());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return geoPoint;
+    }
+
+    private void savePetPhoto(JSONObject jsonObject) throws JSONException {
+        String photoUrl = jsonObject.getJSONObject("photos").getString("medium");
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(photoUrl, new BinaryHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, Response response) {
+                ParseFile photo = null;
+                try {
+                    photo = new ParseFile(response.body().bytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "Couldn't save image from PetFinder");
+                }
+                setPhoto(photo);
+            }
+
+            @Override
+            public void onFailure(int statusCode, @Nullable Headers headers, String errorResponse, @Nullable Throwable throwable) {
+                Log.e(TAG, "Couldn't download image from PetFinder");
+            }
+        });
+    }
 
     public boolean isUserLiked() {
         return mUserLiked;
