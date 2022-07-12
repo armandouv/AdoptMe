@@ -26,6 +26,7 @@ android {
         buildConfigField("String", "SERVER_URL", apikeyProperties['SERVER_URL'])
         buildConfigField("String", "APP_ID", apikeyProperties['APP_ID'])
         buildConfigField("String", "CLIENT_KEY", apikeyProperties['CLIENT_KEY'])
+        buildConfigField("String", "BEARER_TOKEN", apikeyProperties['BEARER_TOKEN'])
     }
 
     buildTypes {
@@ -63,4 +64,6 @@ dependencies {
 
     implementation "com.github.permissions-dispatcher:permissionsdispatcher:4.9.2"
     annotationProcessor "com.github.permissions-dispatcher:permissionsdispatcher-processor:4.9.2"
+
+    implementation 'com.codepath.libraries:asynchttpclient:2.2.0'
 }
