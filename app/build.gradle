@@ -26,7 +26,6 @@ android {
         buildConfigField("String", "SERVER_URL", apikeyProperties['SERVER_URL'])
         buildConfigField("String", "APP_ID", apikeyProperties['APP_ID'])
         buildConfigField("String", "CLIENT_KEY", apikeyProperties['CLIENT_KEY'])
-        buildConfigField("String", "BEARER_TOKEN", apikeyProperties['BEARER_TOKEN'])
     }
 
     buildTypes {
