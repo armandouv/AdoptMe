@@ -11,6 +11,7 @@ import com.codepath.asynchttpclient.AsyncHttpClient;
 import com.codepath.asynchttpclient.callback.BinaryHttpResponseHandler;
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.ParseClassName;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -55,11 +56,10 @@ public class Pet extends ParseObject {
     private boolean mUserLiked;
     private int mLikesCount;
     private Date mPublishedAt;
-
-    public Pet() {
-    }
+    private boolean mIsPetFinderData = false;
 
     public Pet(JSONObject jsonObject, Context context) throws JSONException {
+        mIsPetFinderData = true;
         String UNKNOWN = "unknown";
 
         String type = jsonObject.has("type") ?
@@ -114,6 +114,13 @@ public class Pet extends ParseObject {
         setLocation(location);
         setDescription(description);
         setUser(user);
+    }
+
+    public Pet() {
+    }
+
+    public boolean isPetFinderData() {
+        return mIsPetFinderData;
     }
 
     private void setPublishedAt(Date publishedAt) {
@@ -172,7 +179,8 @@ public class Pet extends ParseObject {
                 ParseFile photo = null;
                 try {
                     photo = new ParseFile(response.body().bytes());
-                } catch (IOException e) {
+                    photo.save();
+                } catch (IOException | ParseException e) {
                     e.printStackTrace();
                     Log.e(TAG, "Couldn't save image from PetFinder");
                 }
