@@ -96,7 +96,11 @@ public class Pet extends ParseObject {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
         TemporalAccessor accessor = dateTimeFormatter.parse(formattedDate);
         setPublishedAt(Date.from(Instant.from(accessor)));
-        // TODO: Add contact details
+
+        ParseUser user = new ParseUser();
+        user.setEmail(contactObject.getString("email"));
+        String phone = contactObject.getString("phone").split(", ")[0];
+        user.put("phone", phone.equals("null") ? UNKNOWN : phone);
 
         savePetPhoto(jsonObject);
 
@@ -109,6 +113,7 @@ public class Pet extends ParseObject {
         setBreed(breed);
         setLocation(location);
         setDescription(description);
+        setUser(user);
     }
 
     private void setPublishedAt(Date publishedAt) {
