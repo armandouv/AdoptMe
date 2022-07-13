@@ -21,7 +21,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +54,7 @@ public class Pet extends ParseObject {
 
     private boolean mUserLiked;
     private int mLikesCount;
+    private Date mPublishedAt;
 
     public Pet() {
     }
@@ -70,19 +75,28 @@ public class Pet extends ParseObject {
                 jsonObject.getString("age") : UNKNOWN;
 
         JSONObject colorsObject = jsonObject.getJSONObject("colors");
-        String color = colorsObject.has("primary") ?
-                colorsObject.getString("primary") : UNKNOWN;
+        String color = colorsObject.getString("primary");
+        if (color.equals("null")) color = UNKNOWN;
 
         String name = jsonObject.has("name") ?
                 jsonObject.getString("name") : UNKNOWN;
 
         JSONObject breedsObject = jsonObject.getJSONObject("colors");
-        String breed = breedsObject.has("primary") ?
-                colorsObject.getString("primary") : UNKNOWN;
+        String breed = breedsObject.getString("primary");
+        if (breed.equals("null")) breed = UNKNOWN;
 
-        ParseGeoPoint location = addressToGeoPoint(jsonObject.getJSONObject("address"), context);
+        JSONObject contactObject = jsonObject.getJSONObject("contact");
+        ParseGeoPoint location = addressToGeoPoint(contactObject.getJSONObject("address"), context);
         String description = jsonObject.has("description") ?
                 jsonObject.getString("description") : UNKNOWN;
+
+        String publishedAt = jsonObject.getString("published_at");
+        int dateLength = publishedAt.length();
+        String formattedDate = publishedAt.substring(0, dateLength - 2) + ":" + publishedAt.substring(dateLength - 2);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
+        TemporalAccessor accessor = dateTimeFormatter.parse(formattedDate);
+        setPublishedAt(Date.from(Instant.from(accessor)));
+        // TODO: Add contact details
 
         savePetPhoto(jsonObject);
 
@@ -95,6 +109,10 @@ public class Pet extends ParseObject {
         setBreed(breed);
         setLocation(location);
         setDescription(description);
+    }
+
+    private void setPublishedAt(Date publishedAt) {
+        mPublishedAt = publishedAt;
     }
 
     public static List<Pet> fromJSONArray(JSONArray results, Context context) throws JSONException {
@@ -111,8 +129,9 @@ public class Pet extends ParseObject {
     private ParseGeoPoint addressToGeoPoint(JSONObject addressObject, Context context) throws JSONException {
         String strAddress = "";
 
-        if (addressObject.has("address1"))
-            strAddress += addressObject.getString("address1") + ", ";
+        String address1 = addressObject.getString("address1");
+        if (!address1.equals("null"))
+            strAddress += address1 + ", ";
 
         strAddress += addressObject.getString("city") + ", "
                 + addressObject.getString("state") + ", "
@@ -138,7 +157,8 @@ public class Pet extends ParseObject {
     }
 
     private void savePetPhoto(JSONObject jsonObject) throws JSONException {
-        String photoUrl = jsonObject.getJSONObject("photos").getString("medium");
+        String photoUrl = jsonObject.getJSONArray("photos")
+                .getJSONObject(0).getString("medium");
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(photoUrl, new BinaryHttpResponseHandler() {
@@ -267,6 +287,13 @@ public class Pet extends ParseObject {
 
     public void setUser(ParseUser user) {
         put(KEY_USER, user);
+    }
+
+    @Override
+    public Date getCreatedAt() {
+        Date createdAt = super.getCreatedAt();
+        return createdAt != null ?
+                createdAt : mPublishedAt;
     }
 
     public static List<String> getPreferencesAttributes() {
