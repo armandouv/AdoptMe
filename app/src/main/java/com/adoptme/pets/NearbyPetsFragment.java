@@ -9,8 +9,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.adoptme.AdoptMeApplication;
 import com.adoptme.databinding.FragmentNearbyPetsBinding;
 import com.adoptme.maps.PetsMapContainerFragment;
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
@@ -19,10 +21,16 @@ import com.google.android.material.slider.Slider;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.Headers;
 
 
 /**
@@ -35,10 +43,10 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
     private final static int DEFAULT_RADIUS_IN_METERS = 5000;
     private final static int MINIMUM_RADIUS_IN_METERS = 1000;
     private final static int MAXIMUM_RADIUS_IN_METERS = 100000;
-
-    private int mPageNumberToLoad = 0;
     private final List<Pet> mPets = new ArrayList<>();
     private final Map<Marker, Pet> mMarkerToPet = new HashMap<>();
+    private int mParsePageNumber = 0;
+    private int mPetFinderPageNumber = 1;
     private Circle mCurrentCircle;
     private FragmentNearbyPetsBinding mBinding;
     private double mCurrentRadiusInMeters = DEFAULT_RADIUS_IN_METERS;
@@ -87,7 +95,9 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
 
     private void resetMap(double radiusInMeters) {
         mCurrentRadiusInMeters = radiusInMeters;
-        mPageNumberToLoad = 0;
+        mParsePageNumber = 0;
+        mPetFinderPageNumber = 1;
+        mPets.clear();
         mBinding.loadMoreButton.setVisibility(View.VISIBLE);
         mBinding.radiusSlider.setValue((float) mCurrentRadiusInMeters);
         queryAndRefreshPets();
@@ -107,13 +117,66 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
         return mBinding.getRoot();
     }
 
+    private void syncData() {
+        if (mParsePageNumber != -1 || mPetFinderPageNumber != -1)
+            mBinding.loadMoreButton.setVisibility(View.VISIBLE);
+        else mBinding.loadMoreButton.setVisibility(View.GONE);
+
+        refreshPets();
+    }
+
     private void queryAndRefreshPets() {
+        mBinding.loadMoreButton.setVisibility(View.GONE);
+
+        queryFromParse();
+        queryFromPetFinder();
+    }
+
+    private void queryFromPetFinder() {
+        if (mPetFinderPageNumber == -1) return;
+
+        String locationStr = getLocation().latitude + "," + getLocation().longitude;
+
+        AdoptMeApplication.getPetFinderClient().getPets(mPetFinderPageNumber, PAGE_SIZE, locationStr,
+                String.valueOf(metersToMiles(mCurrentRadiusInMeters)),
+                new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Headers headers, JSON json) {
+                        JSONObject jsonObject = json.jsonObject;
+                        try {
+                            JSONArray results = jsonObject.getJSONArray("animals");
+                            mPets.addAll(Pet.fromJSONArray(results, getContext()));
+
+                            if (jsonObject.getJSONObject("pagination").getInt("total_pages") == mPetFinderPageNumber)
+                                mPetFinderPageNumber = -1;
+                            else mPetFinderPageNumber++;
+
+                        } catch (JSONException e) {
+                            Log.e(TAG, "JSON Exception while querying for PetFinder data");
+                        }
+                        syncData();
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                        Log.e(TAG, response);
+                    }
+                });
+    }
+
+    private int metersToMiles(double radiusInMeters) {
+        return (int) (radiusInMeters / 1609.34);
+    }
+
+    private void queryFromParse() {
+        if (mParsePageNumber == -1) return;
+
         ParseQuery<Pet> query = ParseQuery.getQuery(Pet.class);
         query.include(Pet.KEY_USER);
         query.addDescendingOrder("createdAt");
 
         // Pagination
-        query.setSkip(PAGE_SIZE * mPageNumberToLoad);
+        query.setSkip(PAGE_SIZE * mParsePageNumber);
         // Query one more element to know if it's the last page.
         query.setLimit(PAGE_SIZE + 1);
 
@@ -127,17 +190,17 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
                 return;
             }
 
-            if (mPageNumberToLoad == 0) mPets.clear();
             mPets.addAll(pets);
 
-            mPageNumberToLoad++;
-
             // This means that the queried page is the last one.
-            if (pets.size() != PAGE_SIZE + 1) mBinding.loadMoreButton.setVisibility(View.GONE);
+            if (pets.size() != PAGE_SIZE + 1) mParsePageNumber = -1;
+            else {
                 // Don't display the last pet, since it'll be displayed in the subsequent page.
-            else mPets.remove(mPets.size() - 1);
+                mPets.remove(mPets.size() - 1);
+                mParsePageNumber++;
+            }
 
-            refreshPets();
+            syncData();
         });
     }
 

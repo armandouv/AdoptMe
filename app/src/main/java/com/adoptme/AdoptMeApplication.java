@@ -10,6 +10,12 @@ import com.parse.ParseObject;
  * Represents the AdoptMe app.
  */
 public class AdoptMeApplication extends Application {
+    private static final PetFinderClient CLIENT = new PetFinderClient();
+
+    public static PetFinderClient getPetFinderClient() {
+        return CLIENT;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
