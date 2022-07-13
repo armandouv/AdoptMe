@@ -54,14 +54,13 @@ public class PetDetailsFragment extends PetsMapContainerFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setUpLikesFunctionality();
-
         mBinding.petName.setText(mPet.getFormattedName());
         Glide.with(requireContext())
                 .load(mPet.getPhoto().getUrl())
                 .into(mBinding.petPhoto);
 
-        mBinding.petPhoto.setOnTouchListener((v, event) -> mGestureDetector.onTouchEvent(event));
+        if (mPet.isPetFinderData()) hideLikes();
+        else setUpLikesFunctionality();
 
         mBinding.petType.setText(mPet.getFormattedType());
         mBinding.petSize.setText(mPet.getFormattedSize());
@@ -74,6 +73,11 @@ public class PetDetailsFragment extends PetsMapContainerFragment {
 
         mBinding.contactEmail.setText(mPet.getUser().getEmail());
         mBinding.contactPhone.setText(mPet.getUser().getString("phone"));
+    }
+
+    void hideLikes() {
+        mBinding.petLikes.setVisibility(View.GONE);
+        mBinding.likeButton.setVisibility(View.GONE);
     }
 
     private void toggleLike() {
@@ -136,6 +140,8 @@ public class PetDetailsFragment extends PetsMapContainerFragment {
      * known before the updates happen.
      */
     private void setUpLikesFunctionality() {
+        mBinding.petPhoto.setOnTouchListener((v, event) -> mGestureDetector.onTouchEvent(event));
+
         ParseUser user = ParseUser.getCurrentUser();
         mPet.getRelation("users").getQuery()
                 .whereEqualTo(ParseUser.KEY_OBJECT_ID, user.getObjectId())
