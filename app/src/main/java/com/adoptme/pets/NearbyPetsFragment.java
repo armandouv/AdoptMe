@@ -98,15 +98,21 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
         mParsePageNumber = 0;
         mPetFinderPageNumber = 1;
         mPets.clear();
+        clearMarkers();
         mBinding.loadMoreButton.setVisibility(View.VISIBLE);
         mBinding.radiusSlider.setValue((float) mCurrentRadiusInMeters);
         queryAndRefreshPets();
     }
 
+    private void clearMarkers() {
+        for (Marker marker : mMarkerToPet.keySet()) marker.remove();
+        mMarkerToPet.clear();
+    }
+
 
     @Override
     public void onMarkerUpdated() {
-        resetMap(DEFAULT_RADIUS_IN_METERS);
+        resetMap(mCurrentRadiusInMeters);
     }
 
     @Override
@@ -117,12 +123,12 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
         return mBinding.getRoot();
     }
 
-    private void syncData() {
+    private void syncData(List<Pet> petsToAdd) {
         if (mParsePageNumber != -1 || mPetFinderPageNumber != -1)
             mBinding.loadMoreButton.setVisibility(View.VISIBLE);
         else mBinding.loadMoreButton.setVisibility(View.GONE);
 
-        refreshPets();
+        refreshPets(petsToAdd);
     }
 
     private void queryAndRefreshPets() {
@@ -143,9 +149,10 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
                     @Override
                     public void onSuccess(int statusCode, Headers headers, JSON json) {
                         JSONObject jsonObject = json.jsonObject;
+                        List<Pet> queriedPets = new ArrayList<>();
                         try {
                             JSONArray results = jsonObject.getJSONArray("animals");
-                            mPets.addAll(Pet.fromJSONArray(results, getContext()));
+                            queriedPets = Pet.fromJSONArray(results, getContext());
 
                             if (jsonObject.getJSONObject("pagination").getInt("total_pages") == mPetFinderPageNumber)
                                 mPetFinderPageNumber = -1;
@@ -154,7 +161,7 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
                         } catch (JSONException e) {
                             Log.e(TAG, "JSON Exception while querying for PetFinder data");
                         }
-                        syncData();
+                        syncData(queriedPets);
                     }
 
                     @Override
@@ -190,17 +197,15 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
                 return;
             }
 
-            mPets.addAll(pets);
-
             // This means that the queried page is the last one.
             if (pets.size() != PAGE_SIZE + 1) mParsePageNumber = -1;
             else {
                 // Don't display the last pet, since it'll be displayed in the subsequent page.
-                mPets.remove(mPets.size() - 1);
+                pets.remove(pets.size() - 1);
                 mParsePageNumber++;
             }
 
-            syncData();
+            syncData(pets);
         });
     }
 
@@ -210,14 +215,12 @@ public class NearbyPetsFragment extends PetsMapContainerFragment {
         mCurrentCircle = setZoom(mCurrentRadiusInMeters);
     }
 
-    private void refreshPets() {
-        for (Marker marker : mMarkerToPet.keySet()) marker.remove();
-        mMarkerToPet.clear();
-
+    private void refreshPets(List<Pet> petsToAdd) {
         // Create a pet marker for each pet and add them to the map. Keep track of markers for future
         // deletion in mMarkerToPet, as well as their corresponding pets for usage in onMapReady's
         // click handler.
-        for (Pet pet : mPets) {
+        for (Pet pet : petsToAdd) {
+            mPets.add(pet);
             Marker marker = addPetMarker(pet);
             mMarkerToPet.put(marker, pet);
         }
