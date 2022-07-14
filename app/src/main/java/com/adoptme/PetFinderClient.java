@@ -9,6 +9,8 @@ import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.json.JSONException;
 
+import java.util.concurrent.Semaphore;
+
 import okhttp3.Headers;
 
 /**
@@ -17,14 +19,21 @@ import okhttp3.Headers;
 public class PetFinderClient extends AsyncHttpClient {
     public static final String REST_URL = "https://api.petfinder.com/v2";
     private static final String TAG = PetFinderClient.class.getSimpleName();
-    private static String mBearerToken;
+    // Ensures the token arrives before any query is done.
+    private final Semaphore mSemaphore = new Semaphore(1);
+    private String mBearerToken;
 
     public PetFinderClient() {
         super();
-        if (mBearerToken == null) authenticate();
+        authenticate();
     }
 
     private void authenticate() {
+        try {
+            mSemaphore.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         String body = "{\"grant_type\":\"client_credentials\"," +
                 "\"client_id\":\"" + BuildConfig.CONSUMER_KEY + "\","
                 + "\"client_secret\":\"" + BuildConfig.CONSUMER_SECRET + "\"}";
@@ -36,6 +45,8 @@ public class PetFinderClient extends AsyncHttpClient {
                         try {
                             // TODO: Refresh token
                             mBearerToken = json.jsonObject.getString("access_token");
+                            // Allow queries to be done only after the token has arrived.
+                            mSemaphore.release();
                         } catch (JSONException e) {
                             e.printStackTrace();
                             Log.e(TAG, "Could not parse bearer token");
@@ -44,14 +55,14 @@ public class PetFinderClient extends AsyncHttpClient {
 
                     @Override
                     public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                        Log.e(TAG, response);
+                        Log.e(TAG, "Could not get bearer token");
                     }
                 });
     }
 
     public void getPets(int page, int pageSize, String locationStr, String distance, JsonHttpResponseHandler handler) {
         RequestHeaders headers = new RequestHeaders();
-        headers.put("Authorization", "Bearer " + mBearerToken);
+        headers.put("Authorization", "Bearer " + getToken());
 
         RequestParams params = new RequestParams();
         params.put("page", page);
@@ -66,9 +77,8 @@ public class PetFinderClient extends AsyncHttpClient {
     }
 
     public void getPets(int page, int pageSize, JsonHttpResponseHandler handler) {
-        // TODO: Wait for token
         RequestHeaders headers = new RequestHeaders();
-        headers.put("Authorization", "Bearer " + mBearerToken);
+        headers.put("Authorization", "Bearer " + getToken());
 
         RequestParams params = new RequestParams();
         params.put("page", page);
@@ -76,5 +86,22 @@ public class PetFinderClient extends AsyncHttpClient {
 
         String apiUrl = REST_URL + "/animals";
         get(apiUrl, headers, params, handler);
+    }
+
+    private String getToken() {
+        // Ensure the token has arrived
+        try {
+            mSemaphore.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (mBearerToken == null)
+            throw new RuntimeException("Token is null");
+
+        String token = mBearerToken;
+        mSemaphore.release();
+
+        return token;
     }
 }
