@@ -12,17 +12,25 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.adoptme.AdoptMeApplication;
 import com.adoptme.databinding.FragmentPetsTimelineBinding;
 import com.adoptme.pets.preferences.PetAttribute;
 import com.adoptme.pets.preferences.PreferencesMenuFragment;
 import com.adoptme.users.LoginActivity;
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.Headers;
 
 /**
  * Displays the 500 most recent Posts.
@@ -30,6 +38,7 @@ import java.util.Map;
 public class PetsTimelineFragment extends Fragment {
 
     public static final String TAG = PetsTimelineFragment.class.getSimpleName();
+    private static final int PAGE_SIZE = 50;
     protected final List<Pet> mPets = new ArrayList<>();
     protected FragmentPetsTimelineBinding mBinding;
     protected PetsAdapter mPetsAdapter;
@@ -51,28 +60,56 @@ public class PetsTimelineFragment extends Fragment {
      * @param isRefreshing Whether the query is done to serve a refresh or it's the initial one.
      */
     protected void populatePetsAndSort(boolean isRefreshing) {
+        if (isRefreshing) mPets.clear();
+        queryFromParseAndPetFinder(isRefreshing);
+    }
+
+    private void queryFromParseAndPetFinder(boolean isRefreshing) {
+        // Query from Parse first
         ParseQuery<Pet> query = ParseQuery.getQuery(Pet.class);
         query.include(Pet.KEY_USER);
-        query.setLimit(500);
+        query.setLimit(PAGE_SIZE);
         query.addDescendingOrder("createdAt");
 
         query.findInBackground((pets, e) -> {
             if (e != null) {
+                e.printStackTrace();
                 Log.e(TAG, "Could not query pets", e);
                 return;
             }
 
-            if (isRefreshing) {
-                mPets.clear();
-                mBinding.swipeContainer.setRefreshing(false);
-            }
-
             mPets.addAll(pets);
-            // Sort after data arrives
-            sortPetsByPreferences();
-
-            mPetsAdapter.notifyDataSetChanged();
+            // Once Parse data is ready, start PetFinder query
+            queryFromPetFinder(isRefreshing);
         });
+    }
+
+    private void queryFromPetFinder(boolean isRefreshing) {
+        AdoptMeApplication.getPetFinderClient().getPets(1, PAGE_SIZE,
+                new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Headers headers, JSON json) {
+                        JSONObject jsonObject = json.jsonObject;
+                        try {
+                            JSONArray results = jsonObject.getJSONArray("animals");
+                            List<Pet> queriedPets = Pet.fromJSONArrayAsync(results, getContext());
+                            mPets.addAll(queriedPets);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.e(TAG, "JSON Exception while querying for PetFinder data");
+                        }
+
+                        // Once all data is ready, sort and display pets
+                        if (isRefreshing) mBinding.swipeContainer.setRefreshing(false);
+                        sortPetsByPreferences();
+                        mPetsAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                        Log.e(TAG, response);
+                    }
+                });
     }
 
     @Override

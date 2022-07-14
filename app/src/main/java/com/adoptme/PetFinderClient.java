@@ -59,6 +59,20 @@ public class PetFinderClient extends AsyncHttpClient {
 
         params.put("location", locationStr);
         params.put("distance", distance);
+        params.put("sort", "distance");
+
+        String apiUrl = REST_URL + "/animals";
+        get(apiUrl, headers, params, handler);
+    }
+
+    public void getPets(int page, int pageSize, JsonHttpResponseHandler handler) {
+        // TODO: Wait for token
+        RequestHeaders headers = new RequestHeaders();
+        headers.put("Authorization", "Bearer " + mBearerToken);
+
+        RequestParams params = new RequestParams();
+        params.put("page", page);
+        params.put("limit", pageSize);
 
         String apiUrl = REST_URL + "/animals";
         get(apiUrl, headers, params, handler);
