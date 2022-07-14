@@ -55,9 +55,10 @@ public class PetDetailsFragment extends PetsMapContainerFragment {
         super.onViewCreated(view, savedInstanceState);
 
         mBinding.petName.setText(mPet.getFormattedName());
-        Glide.with(requireContext())
-                .load(mPet.getPhoto().getUrl())
-                .into(mBinding.petPhoto);
+        if (mPet.getPhoto() != null)
+            Glide.with(requireContext())
+                    .load(mPet.getPhoto().getUrl())
+                    .into(mBinding.petPhoto);
 
         if (mPet.isPetFinderData()) hideLikes();
         else setUpLikesFunctionality();

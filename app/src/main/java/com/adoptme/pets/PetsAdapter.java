@@ -65,9 +65,10 @@ public class PetsAdapter extends RecyclerView.Adapter<PetsAdapter.ViewHolder> {
         public void bind(Pet pet) {
             mBinding.itemName.setText(pet.getFormattedName());
 
-            Glide.with(mContext)
-                    .load(pet.getPhoto().getUrl())
-                    .into(mBinding.itemPhoto);
+            if (pet.getPhoto() != null)
+                Glide.with(mContext)
+                        .load(pet.getPhoto().getUrl())
+                        .into(mBinding.itemPhoto);
 
             mBinding.itemType.setText(pet.getFormattedType());
         }
