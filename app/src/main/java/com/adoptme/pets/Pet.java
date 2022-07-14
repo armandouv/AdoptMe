@@ -167,7 +167,7 @@ public class Pet extends ParseObject {
 
     private void setLocationInBackground(JSONObject addressObject, Context context) {
         new Thread(() -> {
-            ParseGeoPoint geoPoint = null;
+            ParseGeoPoint geoPoint = new ParseGeoPoint();
             try {
                 geoPoint = addressToGeoPoint(addressObject, context);
             } catch (JSONException e) {
