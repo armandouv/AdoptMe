@@ -58,7 +58,7 @@ public class Pet extends ParseObject {
     private Date mPublishedAt;
     private boolean mIsPetFinderData = false;
 
-    public Pet(JSONObject jsonObject, Context context) throws JSONException {
+    public Pet(JSONObject jsonObject, Context context, boolean async) throws JSONException {
         mIsPetFinderData = true;
         String UNKNOWN = "unknown";
 
@@ -86,7 +86,12 @@ public class Pet extends ParseObject {
         if (breed.equals("null")) breed = UNKNOWN;
 
         JSONObject contactObject = jsonObject.getJSONObject("contact");
-        ParseGeoPoint location = addressToGeoPoint(contactObject.getJSONObject("address"), context);
+        if (async) setLocationInBackground(contactObject.getJSONObject("address"), context);
+        else {
+            ParseGeoPoint location = addressToGeoPoint(contactObject.getJSONObject("address"), context);
+            setLocation(location);
+        }
+
         String description = jsonObject.has("description") ?
                 jsonObject.getString("description") : UNKNOWN;
 
@@ -111,7 +116,6 @@ public class Pet extends ParseObject {
         setColor(color);
         setName(name);
         setBreed(breed);
-        setLocation(location);
         setDescription(description);
         setUser(user);
     }
@@ -127,18 +131,26 @@ public class Pet extends ParseObject {
         mPublishedAt = publishedAt;
     }
 
+    public static List<Pet> fromJSONArrayAsync(JSONArray results, Context context) throws JSONException {
+        return fromJSONArray(results, context, true);
+    }
+
     public static List<Pet> fromJSONArray(JSONArray results, Context context) throws JSONException {
+        return fromJSONArray(results, context, false);
+    }
+
+    public static List<Pet> fromJSONArray(JSONArray results, Context context, boolean async) throws JSONException {
         List<Pet> pets = new ArrayList<>();
 
         int length = results.length();
         for (int i = 0; i < length; i++) {
-            pets.add(new Pet(results.getJSONObject(i), context));
+            pets.add(new Pet(results.getJSONObject(i), context, async));
         }
 
         return pets;
     }
 
-    private ParseGeoPoint addressToGeoPoint(JSONObject addressObject, Context context) throws JSONException {
+    private String getStrAddress(JSONObject addressObject) throws JSONException {
         String strAddress = "";
 
         String address1 = addressObject.getString("address1");
@@ -150,13 +162,31 @@ public class Pet extends ParseObject {
                 + addressObject.getString("postcode") + ", "
                 + addressObject.getString("country");
 
+        return strAddress;
+    }
+
+    private void setLocationInBackground(JSONObject addressObject, Context context) {
+        new Thread(() -> {
+            ParseGeoPoint geoPoint = null;
+            try {
+                geoPoint = addressToGeoPoint(addressObject, context);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            setLocation(geoPoint);
+        }).start();
+    }
+
+    private ParseGeoPoint addressToGeoPoint(JSONObject addressObject, Context context) throws JSONException {
+        String strAddress = getStrAddress(addressObject);
+
         Geocoder coder = new Geocoder(context);
         List<Address> address;
         ParseGeoPoint geoPoint = new ParseGeoPoint();
 
         try {
             address = coder.getFromLocationName(strAddress, 5);
-            if (address == null) return null;
+            if (address == null) return geoPoint;
 
             Address location = address.get(0);
             geoPoint.setLatitude(location.getLatitude());
@@ -169,6 +199,9 @@ public class Pet extends ParseObject {
     }
 
     private void savePetPhoto(JSONObject jsonObject) throws JSONException {
+        JSONArray photosArray = jsonObject.getJSONArray("photos");
+        if (photosArray.length() == 0) return;
+
         String photoUrl = jsonObject.getJSONArray("photos")
                 .getJSONObject(0).getString("medium");
 
