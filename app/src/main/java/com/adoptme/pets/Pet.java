@@ -7,6 +7,8 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.adoptme.pets.preferences.PetAttribute;
+import com.adoptme.pets.preferences.PreferencesMenuFragment;
 import com.codepath.asynchttpclient.AsyncHttpClient;
 import com.codepath.asynchttpclient.callback.BinaryHttpResponseHandler;
 import com.google.android.gms.maps.model.LatLng;
@@ -225,6 +227,24 @@ public class Pet extends ParseObject {
                 Log.e(TAG, "Couldn't download image from PetFinder");
             }
         });
+    }
+
+    public boolean matchesAllPreferences() {
+        Map<String, String> petAttributes = getPreferencesAttributesMap();
+        boolean atLeastOneAssigned = false;
+
+        for (PetAttribute attribute : PreferencesMenuFragment.sAttributes) {
+            if (attribute.isAssignedValueEmpty()) continue;
+
+            atLeastOneAssigned = true;
+
+            String petAttributeValue = petAttributes.get(attribute.getName());
+            if (!attribute.getAssignedValue().equals(petAttributeValue))
+                return false;
+        }
+
+        // If no preferences were specified, we don't consider it a match
+        return atLeastOneAssigned;
     }
 
     public boolean isUserLiked() {

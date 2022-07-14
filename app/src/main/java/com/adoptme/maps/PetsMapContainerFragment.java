@@ -4,12 +4,17 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.adoptme.R;
@@ -17,6 +22,7 @@ import com.adoptme.pets.Pet;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -163,10 +169,27 @@ public abstract class PetsMapContainerFragment extends Fragment {
         return (int) (16 - Math.log(scale) / Math.log(2));
     }
 
+    private BitmapDescriptor bitmapFromVector(Context context, int vectorResId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
     public Marker addPetMarker(Pet pet) {
         MarkerOptions options = new MarkerOptions();
         options.position(pet.getLocationAsLatLng());
-        options.icon(BitmapDescriptorFactory.defaultMarker(getUrgencyColor(pet)));
+
+        if (pet.matchesAllPreferences())
+            options.icon(bitmapFromVector(getContext(), R.drawable.ic_baseline_star_24));
+        else
+            options.icon(BitmapDescriptorFactory.defaultMarker(getUrgencyColor(pet)));
 
         return mMap.addMarker(options);
     }
