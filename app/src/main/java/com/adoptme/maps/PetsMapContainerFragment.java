@@ -9,7 +9,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -19,6 +21,12 @@ import androidx.fragment.app.Fragment;
 
 import com.adoptme.R;
 import com.adoptme.pets.Pet;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -44,11 +52,11 @@ import permissions.dispatcher.RuntimePermissions;
  */
 @RuntimePermissions
 public abstract class PetsMapContainerFragment extends Fragment {
+    private static final long DAY_IN_MILLISECONDS = 1000L * 60L * 60L * 24L;
+    private static final long ADOPTION_INTERVAL_IN_MILLISECONDS = DAY_IN_MILLISECONDS * 10L;
     private PetsMapOptions mOptions = new PetsMapOptions();
     private GoogleMap mMap;
     private Marker mCurrentMarker;
-    private static final long DAY_IN_MILLISECONDS = 1000L * 60L * 60L * 24L;
-    private static final long ADOPTION_INTERVAL_IN_MILLISECONDS = DAY_IN_MILLISECONDS * 10L;
 
     public void setOptions(PetsMapOptions options) {
         mOptions = options;
@@ -90,6 +98,32 @@ public abstract class PetsMapContainerFragment extends Fragment {
         PetsMapContainerFragmentPermissionsDispatcher.loadMapWithPermissionCheck(this, mOptions);
     }
 
+    @SuppressLint("MissingPermission")
+    private void requestAndUpdateLocation() {
+        LocationRequest locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); // 1 second
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(locationRequest);
+        LocationSettingsRequest locationSettingsRequest = builder.build();
+
+        SettingsClient settingsClient = LocationServices.getSettingsClient(requireContext());
+        settingsClient.checkLocationSettings(locationSettingsRequest);
+
+        getFusedLocationProviderClient(requireContext()).requestLocationUpdates(locationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(@NonNull LocationResult locationResult) {
+                        updateUserLocation(locationResult.getLastLocation());
+                    }
+                },
+                Looper.myLooper());
+    }
+
+    private void updateUserLocation(Location location) {
+        LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        updateMarker(userLocation);
+    }
+
 
     /**
      * Obtains the user location and sets the marker to it.
@@ -102,8 +136,12 @@ public abstract class PetsMapContainerFragment extends Fragment {
         // Set up initial marker in the user's location,
         getFusedLocationProviderClient(requireContext()).getLastLocation()
                 .addOnSuccessListener(location -> {
-                    LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                    updateMarker(userLocation);
+                    if (location == null) {
+                        requestAndUpdateLocation();
+                        return;
+                    }
+
+                    updateUserLocation(location);
                 });
     }
 
