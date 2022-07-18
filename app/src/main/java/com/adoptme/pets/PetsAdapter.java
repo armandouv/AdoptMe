@@ -8,8 +8,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.adoptme.R;
 import com.adoptme.databinding.ItemPetBinding;
 import com.bumptech.glide.Glide;
+import com.parse.ParseFile;
 
 import java.util.List;
 
@@ -65,10 +67,11 @@ public class PetsAdapter extends RecyclerView.Adapter<PetsAdapter.ViewHolder> {
         public void bind(Pet pet) {
             mBinding.itemName.setText(pet.getFormattedName());
 
-            if (pet.getPhoto() != null)
-                Glide.with(mContext)
-                        .load(pet.getPhoto().getUrl())
-                        .into(mBinding.itemPhoto);
+            ParseFile photo = pet.getPhoto();
+            Glide.with(mContext)
+                    .load(photo != null ? photo.getUrl() : null)
+                    .placeholder(R.drawable.placeholder)
+                    .into(mBinding.itemPhoto);
 
             mBinding.itemType.setText(pet.getFormattedType());
         }

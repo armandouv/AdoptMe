@@ -20,6 +20,7 @@ import com.adoptme.maps.PetsMapContainerFragment;
 import com.adoptme.maps.PetsMapOptions;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.model.LatLng;
+import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
@@ -54,11 +55,11 @@ public class PetDetailsFragment extends PetsMapContainerFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mBinding.petName.setText(mPet.getFormattedName());
-        if (mPet.getPhoto() != null)
-            Glide.with(requireContext())
-                    .load(mPet.getPhoto().getUrl())
-                    .into(mBinding.petPhoto);
+        ParseFile photo = mPet.getPhoto();
+        Glide.with(requireContext())
+                .load(photo != null ? photo.getUrl() : null)
+                .placeholder(R.drawable.placeholder)
+                .into(mBinding.petPhoto);
 
         if (mPet.isPetFinderData()) hideLikes();
         else setUpLikesFunctionality();
