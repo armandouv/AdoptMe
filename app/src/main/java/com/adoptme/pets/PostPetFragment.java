@@ -23,8 +23,6 @@ import com.adoptme.MainActivity;
 import com.adoptme.databinding.FragmentPostPetBinding;
 import com.adoptme.maps.PetsMapContainerFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.parse.ParseFile;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 
 import java.io.File;
@@ -120,22 +118,11 @@ public class PostPetFragment extends PetsMapContainerFragment {
                 return;
             }
 
+            LatLng currentLocation = getMarker().getPosition();
             ParseUser user = ParseUser.getCurrentUser();
 
-            Pet pet = new Pet();
-            pet.setType(type);
-            pet.setSize(size);
-            pet.setGender(gender);
-            pet.setAge(age);
-            pet.setColor(color);
-            pet.setName(name);
-            pet.setBreed(breed);
-            pet.setDescription(description);
-
-            LatLng currentLocation = getMarker().getPosition();
-            pet.setLocation(new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude));
-            pet.setPhoto(new ParseFile(mPhotoFile));
-            pet.setUser(user);
+            Pet pet = new Pet(type, size, gender, age, color, name, breed, description,
+                    currentLocation, mPhotoFile, user);
 
             pet.saveInBackground(e -> {
                 if (e != null) {

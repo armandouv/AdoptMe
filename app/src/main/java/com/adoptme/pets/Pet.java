@@ -23,6 +23,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -59,6 +60,21 @@ public class Pet extends ParseObject {
     private int mLikesCount;
     private Date mPublishedAt;
     private boolean mIsPetFinderData = false;
+
+    public Pet(String type, String size, String gender, String age, String color, String name,
+               String breed, String description, LatLng location, File photoFile, ParseUser user) {
+        setType(type);
+        setSize(size);
+        setGender(gender);
+        setAge(age);
+        setColor(color);
+        setName(name);
+        setBreed(breed);
+        setDescription(description);
+        setLocation(new ParseGeoPoint(location.latitude, location.longitude));
+        setPhoto(new ParseFile(photoFile));
+        setUser(user);
+    }
 
     public Pet(JSONObject jsonObject, Context context, boolean async) throws JSONException {
         mIsPetFinderData = true;
