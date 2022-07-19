@@ -51,8 +51,12 @@ public class PostPetFragment extends PetsMapContainerFragment {
         return mBinding.getRoot();
     }
 
-    private void displayMissingAttributesToast() {
-        Toast.makeText(getContext(), "Missing attributes", Toast.LENGTH_SHORT).show();
+    private void displayMissingAttributesToast(List<String> missingAttributes) {
+        StringBuilder stringBuilder = new StringBuilder("Missing attributes:\n");
+        for (String missingAttribute : missingAttributes)
+            stringBuilder.append(missingAttribute).append("\n");
+
+        Toast.makeText(getContext(), stringBuilder.toString(), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -103,8 +107,7 @@ public class PostPetFragment extends PetsMapContainerFragment {
             if (description.isEmpty()) missingAttributes.add("Description");
 
             if (!missingAttributes.isEmpty()) {
-                displayMissingAttributesToast();
-                // TODO: Display missing attributes.
+                displayMissingAttributesToast(missingAttributes);
                 return;
             }
 
