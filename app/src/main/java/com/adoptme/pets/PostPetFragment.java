@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,6 +27,8 @@ import com.parse.ParseUser;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import es.dmoral.toasty.Toasty;
 
 /**
  * Pet posting screen.
@@ -56,7 +57,7 @@ public class PostPetFragment extends PetsMapContainerFragment {
         for (String missingAttribute : missingAttributes)
             stringBuilder.append(missingAttribute).append("\n");
 
-        Toast.makeText(getContext(), stringBuilder.toString(), Toast.LENGTH_LONG).show();
+        Toasty.error(requireContext(), stringBuilder.toString()).show();
     }
 
     @Override
@@ -112,12 +113,12 @@ public class PostPetFragment extends PetsMapContainerFragment {
             }
 
             if (getMarker() == null) {
-                Toast.makeText(getContext(), "Location must be specified", Toast.LENGTH_SHORT).show();
+                Toasty.error(requireContext(), "Location must be specified").show();
                 return;
             }
 
             if (mPhotoFile == null || mBinding.inputImage.getDrawable() == null) {
-                Toast.makeText(getContext(), "You must upload an image", Toast.LENGTH_SHORT).show();
+                Toasty.error(requireContext(), "You must upload an image").show();
                 return;
             }
 
@@ -129,7 +130,7 @@ public class PostPetFragment extends PetsMapContainerFragment {
 
             pet.saveInBackground(e -> {
                 if (e != null) {
-                    Toast.makeText(getContext(), "Could not create pet", Toast.LENGTH_SHORT).show();
+                    Toasty.error(requireContext(), "Could not create pet").show();
                     return;
                 }
 
@@ -142,7 +143,7 @@ public class PostPetFragment extends PetsMapContainerFragment {
                 mBinding.inputBreed.setText("");
                 mBinding.inputDescription.setText("");
                 mBinding.inputImage.setImageResource(0);
-                Toast.makeText(getContext(), "Pet created successfully", Toast.LENGTH_LONG).show();
+                Toasty.success(requireContext(), "Pet created successfully").show();
 
                 ((MainActivity) getActivity()).switchToPetsTimeline();
             });
@@ -181,7 +182,7 @@ public class PostPetFragment extends PetsMapContainerFragment {
                 Bitmap takenImage = BitmapFactory.decodeFile(mPhotoFile.getAbsolutePath());
                 mBinding.inputImage.setImageBitmap(takenImage);
             } else
-                Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
+                Toasty.error(requireContext(), "Picture wasn't taken!").show();
         }
     }
 }

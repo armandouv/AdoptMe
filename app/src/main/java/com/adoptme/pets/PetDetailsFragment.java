@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,13 +24,15 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
+import es.dmoral.toasty.Toasty;
+
 /**
  * Displays a detailed view of a Pet.
  */
 public class PetDetailsFragment extends PetsMapContainerFragment {
 
-    private Pet mPet;
     private final GestureDetector mGestureDetector = new GestureDetector(getContext(), new DoubleTapListener());
+    private Pet mPet;
     private FragmentPetDetailsBinding mBinding;
 
     public PetDetailsFragment() {
@@ -97,8 +98,7 @@ public class PetDetailsFragment extends PetsMapContainerFragment {
 
         mPet.saveInBackground(e -> {
             if (e != null)
-                Toast.makeText(getContext(),
-                        "Error while liking or unliking the pet", Toast.LENGTH_SHORT).show();
+                Toasty.error(requireContext(), "Error while liking or unliking the pet").show();
 
             mPet.toggleIsUserLiked();
             mBinding.petLikes.setText(getString(R.string.likes, mPet.getLikesCount()));

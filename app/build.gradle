@@ -65,4 +65,6 @@ dependencies {
     annotationProcessor "com.github.permissions-dispatcher:permissionsdispatcher-processor:4.9.2"
 
     implementation 'com.codepath.libraries:asynchttpclient:2.2.0'
+
+    implementation 'com.github.GrenderG:Toasty:1.5.2'
 }

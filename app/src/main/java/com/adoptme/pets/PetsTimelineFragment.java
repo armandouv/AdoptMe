@@ -5,7 +5,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import es.dmoral.toasty.Toasty;
 import okhttp3.Headers;
 
 /**
@@ -119,11 +119,11 @@ public class PetsTimelineFragment extends Fragment {
         mBinding.logoutButton.setOnClickListener(v ->
                 ParseUser.logOutInBackground(e -> {
                     if (e != null) {
-                        Toast.makeText(getContext(), "Couldn't log out", Toast.LENGTH_SHORT).show();
+                        Toasty.error(requireContext(), "Couldn't log out").show();
                         return;
                     }
 
-                    Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                    Toasty.info(requireContext(), "Logged out").show();
                     LoginActivity.launchAndClear(getActivity());
                 }));
 

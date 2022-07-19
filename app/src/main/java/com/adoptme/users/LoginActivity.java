@@ -4,13 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.adoptme.MainActivity;
 import com.adoptme.databinding.ActivityLoginBinding;
 import com.parse.ParseUser;
+
+import es.dmoral.toasty.Toasty;
 
 /**
  * Allows a User to log in.
@@ -47,12 +48,12 @@ public class LoginActivity extends AppCompatActivity {
             Editable password = mBinding.password.getText();
 
             if (username.toString().isEmpty()) {
-                Toast.makeText(this, "Username must not be empty", Toast.LENGTH_SHORT).show();
+                Toasty.error(this, "Username must not be empty").show();
                 return;
             }
 
             if (password.toString().isEmpty()) {
-                Toast.makeText(this, "Password must not be empty", Toast.LENGTH_SHORT).show();
+                Toasty.error(this, "Password must not be empty").show();
                 return;
             }
 
@@ -68,11 +69,11 @@ public class LoginActivity extends AppCompatActivity {
     private void loginUser(String username, String password) {
         ParseUser.logInInBackground(username, password, (user, e) -> {
             if (e != null) {
-                Toast.makeText(this, "Couldn't log in", Toast.LENGTH_SHORT).show();
+                Toasty.error(this, "Couldn't log in").show();
                 return;
             }
 
-            Toast.makeText(this, "Success!", Toast.LENGTH_SHORT).show();
+            Toasty.success(this, "Logged in successfully!").show();
             MainActivity.launchAndClear(this);
         });
     }

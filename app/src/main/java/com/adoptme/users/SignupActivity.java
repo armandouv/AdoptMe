@@ -4,13 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.adoptme.MainActivity;
 import com.adoptme.databinding.ActivitySignupBinding;
 import com.parse.ParseUser;
+
+import es.dmoral.toasty.Toasty;
 
 /**
  * Allows a User to sign up.
@@ -45,12 +46,12 @@ public class SignupActivity extends AppCompatActivity {
             Editable password = mBinding.passwordSignup.getText();
 
             if (username.toString().isEmpty()) {
-                Toast.makeText(this, "Username must not be empty", Toast.LENGTH_SHORT).show();
+                Toasty.error(this, "Username must not be empty").show();
                 return;
             }
 
             if (password.toString().isEmpty()) {
-                Toast.makeText(this, "Password must not be empty", Toast.LENGTH_SHORT).show();
+                Toasty.error(this, "Password must not be empty").show();
                 return;
             }
 
@@ -68,11 +69,11 @@ public class SignupActivity extends AppCompatActivity {
 
         user.signUpInBackground(e -> {
             if (e != null) {
-                Toast.makeText(this, "Couldn't sign up", Toast.LENGTH_SHORT).show();
+                Toasty.error(this, "Couldn't sign up").show();
                 return;
             }
 
-            Toast.makeText(this, "Success!", Toast.LENGTH_SHORT).show();
+            Toasty.success(this, "Signed up successfully!").show();
             MainActivity.launchAndClear(this);
         });
     }
