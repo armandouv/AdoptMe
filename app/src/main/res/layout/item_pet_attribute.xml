@@ -2,12 +2,13 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginTop="20dp">
 
-    <EditText
-        android:id="@+id/attribute"
-        android:layout_width="match_parent"
-        android:layout_height="58dp"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/attribute_layout"
+        android:layout_width="343dp"
+        android:layout_height="63dp"
         android:layout_margin="0dp"
         android:layout_marginTop="4dp"
         android:autofillHints="Value"
@@ -18,5 +19,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/attribute"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

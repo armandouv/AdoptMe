@@ -9,8 +9,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/input_type"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_type_layout"
             android:layout_width="376dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -19,10 +19,17 @@
             android:ems="10"
             android:hint="@string/type"
             android:inputType="text"
-            tools:ignore="LabelFor" />
+            tools:ignore="LabelFor">
 
-        <EditText
-            android:id="@+id/input_size"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_size_layout"
             android:layout_width="376dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -31,10 +38,17 @@
             android:ems="10"
             android:hint="@string/size"
             android:inputType="text"
-            tools:ignore="LabelFor,TextFields" />
+            tools:ignore="LabelFor,TextFields">
 
-        <EditText
-            android:id="@+id/input_gender"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_size"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_gender_layout"
             android:layout_width="376dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -43,10 +57,17 @@
             android:ems="10"
             android:hint="@string/gender"
             android:inputType="text"
-            tools:ignore="LabelFor" />
+            tools:ignore="LabelFor">
 
-        <EditText
-            android:id="@+id/input_age"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_gender"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_age_layout"
             android:layout_width="376dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -55,10 +76,17 @@
             android:ems="10"
             android:hint="@string/age"
             android:inputType="text"
-            tools:ignore="LabelFor" />
+            tools:ignore="LabelFor">
 
-        <EditText
-            android:id="@+id/input_color"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_age"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_color_layout"
             android:layout_width="376dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -67,10 +95,17 @@
             android:ems="10"
             android:hint="@string/color"
             android:inputType="text"
-            tools:ignore="LabelFor" />
+            tools:ignore="LabelFor">
 
-        <EditText
-            android:id="@+id/input_name"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_color"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_name_layout"
             android:layout_width="376dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -79,10 +114,17 @@
             android:ems="10"
             android:hint="@string/name"
             android:inputType="text"
-            tools:ignore="LabelFor" />
+            tools:ignore="LabelFor">
 
-        <EditText
-            android:id="@+id/input_breed"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_breed_layout"
             android:layout_width="376dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -91,10 +133,17 @@
             android:ems="10"
             android:hint="@string/breed"
             android:inputType="text"
-            tools:ignore="LabelFor" />
+            tools:ignore="LabelFor">
 
-        <EditText
-            android:id="@+id/input_description"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_breed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_description_layout"
             android:layout_width="376dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -103,7 +152,14 @@
             android:ems="10"
             android:hint="@string/description"
             android:inputType="text"
-            tools:ignore="LabelFor" />
+            tools:ignore="LabelFor">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <fragment
             android:id="@+id/map"
