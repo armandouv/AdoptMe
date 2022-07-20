@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import com.adoptme.databinding.ItemPetAttributeBinding;
+import com.adoptme.pets.Formatter;
 import com.woxthebox.draglistview.DragItemAdapter;
 
 import java.util.List;
@@ -58,7 +59,7 @@ public class PreferencesAdapter extends DragItemAdapter<PetAttribute, DragItemAd
         }
 
         public void bind(PetAttribute attribute) {
-            mBinding.attribute.setHint(attribute.getName());
+            mBinding.attributeLayout.setHint(Formatter.getFormatted(attribute.getName()));
             mBinding.attribute.setText(attribute.getAssignedValue());
             mBinding.attribute.addTextChangedListener(new TextWatcher() {
                 @Override

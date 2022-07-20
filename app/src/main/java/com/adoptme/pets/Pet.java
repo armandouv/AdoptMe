@@ -141,14 +141,6 @@ public class Pet extends ParseObject {
     public Pet() {
     }
 
-    public boolean isPetFinderData() {
-        return mIsPetFinderData;
-    }
-
-    private void setPublishedAt(Date publishedAt) {
-        mPublishedAt = publishedAt;
-    }
-
     public static List<Pet> fromJSONArrayAsync(JSONArray results, Context context) throws JSONException {
         return fromJSONArray(results, context, true);
     }
@@ -166,6 +158,27 @@ public class Pet extends ParseObject {
         }
 
         return pets;
+    }
+
+    public static List<String> getPreferencesAttributes() {
+        List<String> attributes = new ArrayList<>();
+
+        attributes.add(KEY_TYPE);
+        attributes.add(KEY_SIZE);
+        attributes.add(KEY_GENDER);
+        attributes.add(KEY_AGE);
+        attributes.add(KEY_COLOR);
+        attributes.add(KEY_BREED);
+
+        return attributes;
+    }
+
+    public boolean isPetFinderData() {
+        return mIsPetFinderData;
+    }
+
+    private void setPublishedAt(Date publishedAt) {
+        mPublishedAt = publishedAt;
     }
 
     private String getStrAddress(JSONObject addressObject) throws JSONException {
@@ -378,19 +391,6 @@ public class Pet extends ParseObject {
                 createdAt : mPublishedAt;
     }
 
-    public static List<String> getPreferencesAttributes() {
-        List<String> attributes = new ArrayList<>();
-
-        attributes.add(KEY_TYPE);
-        attributes.add(KEY_SIZE);
-        attributes.add(KEY_GENDER);
-        attributes.add(KEY_AGE);
-        attributes.add(KEY_COLOR);
-        attributes.add(KEY_BREED);
-
-        return attributes;
-    }
-
     public Map<String, String> getPreferencesAttributesMap() {
         Map<String, String> attributes = new HashMap<>();
 
@@ -406,40 +406,35 @@ public class Pet extends ParseObject {
         return new LatLng(location.getLatitude(), location.getLongitude());
     }
 
-    private String getFormatted(String value) {
-        if (value.isEmpty()) return value;
-        return Character.toUpperCase(value.charAt(0)) + value.substring(1);
-    }
-
     public String getFormattedType() {
-        return getFormatted(getType());
+        return Formatter.getFormatted(getType());
     }
 
     public String getFormattedSize() {
-        return getFormatted(getSize());
+        return Formatter.getFormatted(getSize());
     }
 
     public String getFormattedGender() {
-        return getFormatted(getGender());
+        return Formatter.getFormatted(getGender());
     }
 
     public String getFormattedAge() {
-        return getFormatted(getAge());
+        return Formatter.getFormatted(getAge());
     }
 
     public String getFormattedName() {
-        return getFormatted(getName());
+        return Formatter.getFormatted(getName());
     }
 
     public String getFormattedBreed() {
-        return getFormatted(getBreed());
+        return Formatter.getFormatted(getBreed());
     }
 
     public String getFormattedDescription() {
-        return getFormatted(getDescription());
+        return Formatter.getFormatted(getDescription());
     }
 
     public String getFormattedColor() {
-        return getFormatted(getColor());
+        return Formatter.getFormatted(getColor());
     }
 }
