@@ -55,21 +55,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="false"
-                android:text="@string/test" />
+                android:text="@string/test"
+                android:textColor="#4caf50"
+                app:chipStrokeColor="#4caf50" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/pet_breed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="false"
-                android:text="@string/test" />
+                android:text="@string/test"
+                android:textColor="#0d47a1"
+                app:chipStrokeColor="#0d47a1" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/pet_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="false"
-                android:text="@string/test" />
+                android:text="@string/test"
+                android:textColor="#e64a19"
+                app:chipStrokeColor="#e64a19" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/pet_name"
@@ -83,14 +89,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="false"
-                android:text="@string/test" />
+                android:text="@string/test"
+                android:textColor="#7b1fa2"
+                app:chipStrokeColor="#7b1fa2" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/pet_age"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="false"
-                android:text="@string/test" />
+                android:text="@string/test"
+                android:textColor="#00796b"
+                app:chipStrokeColor="#00796b" />
 
         </com.google.android.material.chip.ChipGroup>
 
