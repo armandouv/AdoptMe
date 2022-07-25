@@ -1,6 +1,8 @@
 package com.adoptme.pets;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -10,6 +12,8 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -57,9 +61,15 @@ public class PetDetailsFragment extends PetsMapContainerFragment {
         super.onViewCreated(view, savedInstanceState);
 
         ParseFile photo = mPet.getPhoto();
+
+        Bitmap placeholder = BitmapFactory.decodeResource(requireContext().getResources(), R.drawable.placeholder);
+        RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(requireContext().getResources(), placeholder);
+        circularBitmapDrawable.setCircular(true);
+
         Glide.with(requireContext())
                 .load(photo != null ? photo.getUrl() : null)
-                .placeholder(R.drawable.placeholder)
+                .placeholder(circularBitmapDrawable)
+                .circleCrop()
                 .into(mBinding.petPhoto);
 
         if (mPet.isPetFinderData()) hideLikes();
