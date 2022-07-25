@@ -92,7 +92,7 @@ public class PetsTimelineFragment extends Fragment {
                         JSONObject jsonObject = json.jsonObject;
                         try {
                             JSONArray results = jsonObject.getJSONArray("animals");
-                            List<Pet> queriedPets = Pet.fromJSONArrayAsync(results, getContext());
+                            List<Pet> queriedPets = Pet.fromJSONArrayAsync(results, requireContext());
                             mPets.addAll(queriedPets);
                         } catch (JSONException e) {
                             e.printStackTrace();
